@@ -1,3 +1,16 @@
+# Thesis Project Notice
+This repository is a modified fork of [RelaX](https://github.com/dbis-uibk/relax), originally developed by Victor Mates and Rebecca Grasser under the MIT License.
+
+Modifications have been made by Alexia Donati, 2025-2026, as part of a thesis project at the University of Liège.
+
+This repository’s default branch (thesis-work) contains modifications and extensions made as part of a thesis project.
+
+The original upstream code is preserved in the development branch.
+
+---
+
+# Original README
+
 # Relax
 A relational algebra calculator
 
