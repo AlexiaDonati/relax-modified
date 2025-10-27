@@ -161,7 +161,8 @@ export class Schema {
 		const conflicts = [];
 
 		for (let i = 0; i < this._size; i++) {
-			const index = schemaB.getColumnIndex(this._names[i], this._relAliases[i], false);
+			// const index = schemaB.getColumnIndex(this._names[i], this._relAliases[i], false);
+			const index = schemaB.getColumnIndex(this._names[i], null, false);
 			if (index !== -1) {
 				conflicts.push(this.getColumn(i));
 			}
@@ -169,6 +170,7 @@ export class Schema {
 		return conflicts;
 	}
 
+	// TODO ALEXIA modify this to remove relAlias
 	getColumnIndexArray(name: string | number, relAlias: string | null) {
 		let index;
 		if (typeof (name) === 'string') {

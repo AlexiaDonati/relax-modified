@@ -53,7 +53,8 @@ export class Column {
 	}
 
 	equals(columnB: Column) {
-		return this._name === columnB._name && this._relAlias === columnB._relAlias;
+		// return this._name === columnB._name && this._relAlias === columnB._relAlias;
+		return this._name === columnB._name;
 	}
 
 	static printColumn(name: string | number, relAlias: string | null): string {
@@ -65,9 +66,10 @@ export class Column {
 			pName = name;
 		}
 
-		if (relAlias === null) {
-			return pName;
-		}
-		return `${relAlias}.${pName}`;
+		return pName;
+		// if (relAlias === null) {
+		// 	return pName;
+		// }
+		// return `${relAlias}.${pName}`;
 	}
 }
