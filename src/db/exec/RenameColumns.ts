@@ -115,7 +115,8 @@ export class RenameColumns extends RANodeUnary {
         const list = this._renameList;
         for (let i = 0; i < list.length; i++) {
             const e = list[i];
-            out.push(`${e.newName}←${Column.printColumn(e.oldName, e.oldRelAlias)}`);
+            //out.push(`${e.newName}←${Column.printColumn(e.oldName, e.oldRelAlias)}`);
+            out.push(`${Column.printColumn(e.oldName, e.oldRelAlias)}←${e.newName}`);
         }
 
         return out.join(', ');
