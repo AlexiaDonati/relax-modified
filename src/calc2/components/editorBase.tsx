@@ -1285,7 +1285,8 @@ export class EditorBase extends React.Component<Props, State> {
 			};
 			const headers: string[] = [];
 			schema._relAliases.forEach((r: any, i: number) => {
-				headers.push(`${r}.${schema._names[i]}`);
+				headers.push(`${schema._names[i]}`);
+				// headers.push(`${r}.${schema._names[i]}`);
 			});
 			
 			let csv: string;
