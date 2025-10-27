@@ -189,12 +189,14 @@ export class EditorRelalg extends React.Component<Props, State> {
 								tooltipTitle: 'calc.editors.ra.toolbar.rename-columns-operator',
 								tooltip: 'calc.editors.ra.toolbar.rename-columns-operator-content',
 							},
+							/*
 							{
 								label: '→',
 								onClick: this.replaceText,
 								tooltipTitle: 'calc.editors.ra.toolbar.right-arrow',
 								tooltip: 'calc.editors.ra.toolbar.right-arrow-content',
 							},
+							*/
 							{
 								label: 'τ',
 								onClick: this.replaceText,
