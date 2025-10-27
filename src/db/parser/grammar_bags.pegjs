@@ -444,7 +444,8 @@ assignment
 
 
 namedColumnExpr
-= a:valueExpr arrowRight dst:unqualifiedColumnName
+//= a:valueExpr arrowRight dst:unqualifiedColumnName
+= dst:unqualifiedColumnName arrowRight a:valueExpr 
 	{
 		return {
 			type: 'namedColumnExpr',
@@ -455,7 +456,8 @@ namedColumnExpr
 			codeInfo: getCodeInfo()
 		};
 	}
-/ dst:unqualifiedColumnName arrowLeft a:valueExpr
+/// dst:unqualifiedColumnName arrowLeft a:valueExpr
+/ a:valueExpr arrowLeft dst:unqualifiedColumnName
 	{
 		return {
 			type: 'namedColumnExpr',
@@ -502,9 +504,9 @@ listOfColumns
 		return t;
 	}
 
-// e.g. "a.newName <- a.oldName" for the renaming of columns
 colAssignment
-= dst:unqualifiedColumnName arrowLeft src:columnName
+//= dst:unqualifiedColumnName arrowLeft src:columnName
+= src:columnName arrowLeft dst:unqualifiedColumnName
 	{
 		return {
 			type: 'colAssignment',
@@ -514,7 +516,8 @@ colAssignment
 			codeInfo: getCodeInfo()
 		};
 	}
-/ src:columnName arrowRight dst:unqualifiedColumnName
+/// src:columnName arrowRight dst:unqualifiedColumnName
+/ dst:unqualifiedColumnName arrowRight src:columnName
 	{
 		return {
 			type: 'colAssignment',
@@ -587,12 +590,14 @@ aggFunction
 	}
 
 aggFunctionArgument
-= func:aggFunction arrowRight name:unqualifiedColumnName
+//= func:aggFunction arrowRight name:unqualifiedColumnName
+= name:unqualifiedColumnName arrowRight func:aggFunction
 	{
 		func.name = name;
 		return func;
 	}
-/ name:unqualifiedColumnName arrowLeft func:aggFunction
+/// name:unqualifiedColumnName arrowLeft func:aggFunction
+/ func:aggFunction arrowLeft name:unqualifiedColumnName
 	{
 		func.name = name;
 		return func;
