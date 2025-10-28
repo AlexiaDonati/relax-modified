@@ -162,9 +162,27 @@ export class EditorRelalg extends React.Component<Props, State> {
 				}}
 				enableInlineRelationEditor={true}
 				toolbar={[
-					{
+					{ // basic operators
 						math: true,
 						items: [
+							{
+								label: '∪',
+								onClick: this.replaceText,
+								tooltipTitle: 'calc.editors.ra.toolbar.union',
+								tooltip: 'calc.editors.ra.toolbar.union-content',
+							},
+							{
+								label: '-',
+								onClick: this.replaceText,
+								tooltipTitle: 'calc.editors.ra.toolbar.subtraction',
+								tooltip: 'calc.editors.ra.toolbar.subtraction-content',
+							},
+							{
+								label: '⨯',
+								onClick: this.replaceText,
+								tooltipTitle: 'calc.editors.ra.toolbar.cross-join',
+								tooltip: 'calc.editors.ra.toolbar.cross-join-content',
+							},
 							{
 								label: 'π',
 								onClick: this.replaceText,
@@ -189,29 +207,38 @@ export class EditorRelalg extends React.Component<Props, State> {
 								tooltipTitle: 'calc.editors.ra.toolbar.rename-columns-operator',
 								tooltip: 'calc.editors.ra.toolbar.rename-columns-operator-content',
 							},
-							/*
+						],
+					},
+
+                    { items: [{ type: 'separator' }] },
+					
+					{ // derived operators
+						math: true,
+						items: [
 							{
-								label: '→',
+								label: '∩',
 								onClick: this.replaceText,
-								tooltipTitle: 'calc.editors.ra.toolbar.right-arrow',
-								tooltip: 'calc.editors.ra.toolbar.right-arrow-content',
+								tooltipTitle: 'calc.editors.ra.toolbar.intersect',
+								tooltip: 'calc.editors.ra.toolbar.intersect-content',
 							},
-							*/
 							{
-								label: 'τ',
+								label: '⨝',
 								onClick: this.replaceText,
-								tooltipTitle: 'calc.editors.ra.toolbar.orderBy',
-								tooltip: 'calc.editors.ra.toolbar.orderBy-content',
+								tooltipTitle: 'calc.editors.ra.toolbar.natural-join',
+								tooltip: 'calc.editors.ra.toolbar.natural-join-content',
 							},
 							{
-								label: 'γ',
+								label: '÷',
 								onClick: this.replaceText,
-								tooltipTitle: 'calc.editors.ra.toolbar.groupBy',
-								tooltip: 'calc.editors.ra.toolbar.groupBy-content',
+								tooltipTitle: 'calc.editors.ra.toolbar.division',
+								tooltip: 'calc.editors.ra.toolbar.division-content',
 							},
 						],
 					},
-					{
+
+                    { items: [{ type: 'separator' }] },
+					
+					{ // logical operators and comparisons
 						math: true,
 						items: [
 							{
@@ -259,50 +286,25 @@ export class EditorRelalg extends React.Component<Props, State> {
 							},
 						],
 					},
-					{
+
+					{ items: [{ type: 'separator' }] },
+
+					{ // extended operators
 						math: true,
 						items: [
 							{
-								label: '∩',
+								label: 'τ',
 								onClick: this.replaceText,
-								tooltipTitle: 'calc.editors.ra.toolbar.intersect',
-								tooltip: 'calc.editors.ra.toolbar.intersect-content',
+								tooltipTitle: 'calc.editors.ra.toolbar.orderBy',
+								tooltip: 'calc.editors.ra.toolbar.orderBy-content',
 							},
 							{
-								label: '∪',
+								label: 'γ',
 								onClick: this.replaceText,
-								tooltipTitle: 'calc.editors.ra.toolbar.union',
-								tooltip: 'calc.editors.ra.toolbar.union-content',
+								tooltipTitle: 'calc.editors.ra.toolbar.groupBy',
+								tooltip: 'calc.editors.ra.toolbar.groupBy-content',
 							},
-							{
-								label: '÷',
-								onClick: this.replaceText,
-								tooltipTitle: 'calc.editors.ra.toolbar.division',
-								tooltip: 'calc.editors.ra.toolbar.division-content',
-							},
-							{
-								label: '-',
-								onClick: this.replaceText,
-								tooltipTitle: 'calc.editors.ra.toolbar.subtraction',
-								tooltip: 'calc.editors.ra.toolbar.subtraction-content',
-							},
-						],
-					},
-					{
-						math: true,
-						items: [
-							{
-								label: '⨯',
-								onClick: this.replaceText,
-								tooltipTitle: 'calc.editors.ra.toolbar.cross-join',
-								tooltip: 'calc.editors.ra.toolbar.cross-join-content',
-							},
-							{
-								label: '⨝',
-								onClick: this.replaceText,
-								tooltipTitle: 'calc.editors.ra.toolbar.natural-join',
-								tooltip: 'calc.editors.ra.toolbar.natural-join-content',
-							},
+							
 							{
 								label: '⟕',
 								onClick: this.replaceText,
@@ -341,7 +343,10 @@ export class EditorRelalg extends React.Component<Props, State> {
 							},
 						],
 					},
-					{
+
+					{ items: [{ type: 'separator' }] },
+
+					{ // assignment
 						math: true,
 						items: [
 							{
@@ -350,18 +355,15 @@ export class EditorRelalg extends React.Component<Props, State> {
 								tooltipTitle: 'calc.editors.ra.toolbar.assignment',
 								tooltip: 'calc.editors.ra.toolbar.assignment-content',
 							},
-							{
-								label: '--',
-								onClick: item => this.replaceText(item, '-- '),
-								tooltipTitle: 'calc.editors.ra.toolbar.single-line-comment',
-								tooltip: 'calc.editors.ra.toolbar.single-line-comment-content',
-							},
-							{
-								label: '/*',
-								onClick: item => this.replaceText(item, '/*  */'),
-								tooltipTitle: 'calc.editors.ra.toolbar.multi-line-comment',
-								tooltip: 'calc.editors.ra.toolbar.multi-line-comment-content',
-							},
+						],
+					},
+
+					{ items: [{ type: 'separator' }] },
+
+					{ // misc
+						math: true,
+						items: [
+							
 							{
 								label: '{}',
 								onClick: item => this.replaceText(item, '{a:string, b:number, X.c:date\n\ta, 1, 1970-01-01\n}'),
@@ -370,8 +372,9 @@ export class EditorRelalg extends React.Component<Props, State> {
 							},
 						],
 					},
-					{
+					{ 
 						items: [
+							
 							{
 								label: <FontAwesomeIcon icon={faTable as IconProp} />,
 								onClick: () => {
@@ -397,6 +400,29 @@ export class EditorRelalg extends React.Component<Props, State> {
 							},
 						],
 					},
+
+					{ items: [{ type: 'separator' }] },
+
+					{ // comments
+						math: true,
+						items: [
+							{
+								label: '--',
+								onClick: item => this.replaceText(item, '-- '),
+								tooltipTitle: 'calc.editors.ra.toolbar.single-line-comment',
+								tooltip: 'calc.editors.ra.toolbar.single-line-comment-content',
+							},
+							{
+								label: '/*',
+								onClick: item => this.replaceText(item, '/*  */'),
+								tooltipTitle: 'calc.editors.ra.toolbar.multi-line-comment',
+								tooltip: 'calc.editors.ra.toolbar.multi-line-comment-content',
+							},
+						],
+					},
+
+					{ items: [{ type: 'separator' }] },
+					
 					{
 						items: [
 							{
