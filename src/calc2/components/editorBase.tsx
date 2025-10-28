@@ -1768,10 +1768,13 @@ export class EditorBase extends React.Component<Props, State> {
 		});
 	}
 
-	public replaceText(item: Item, overwrite?: string) {
-		const text = typeof item.label === 'string' ? item.label : '';
-		this.replaceSelection(text, overwrite);
-	}
+	public replaceText(item: Item, overwrite?: string) { // item may be a separator (no label).
+        let text = '';
+        if ((item as any).label && typeof (item as any).label === 'string') {
+            text = (item as any).label;
+        }
+        this.replaceSelection(text, overwrite);
+    }
 
 	public replaceSelection(text: string, overwrite?: string) {
 		this.setText(overwrite || text, 'selection');

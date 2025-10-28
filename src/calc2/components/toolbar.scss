@@ -41,3 +41,12 @@
 	background-color: #d9d9d9;
 	border-style: none !important;
 }
+
+.toolbar__separator {
+    display: inline-block;
+    width: 1px;
+    height: 20px;
+    margin: 0 8px;
+    vertical-align: middle;
+    background: rgba(0,0,0,0.15);
+}

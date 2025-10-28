@@ -27,6 +27,8 @@ export type Item<V = string> = {
 	value: V,
 	onChange: (value: V) => void,
 	className?: string | '',
+} | {
+    type: 'separator' // new separator item
 };
 export type Group = {
 	/** defaults to false */
@@ -43,29 +45,31 @@ export class Toolbar extends React.Component<Props> {
 		const { groups } = this.props;
 		return (
 			<div className="toolbar codemirror-toolbar">
-				{groups.map((group, index) => (
-					group.items.map((item, index) => (
-						<Popover
-							key={index}
-							trigger={['hover', 'focus']}
-							placement={item.type === 'dropdown' ? 'top' : 'bottom'}
-							title={item.tooltipTitle ? String(t(item.tooltipTitle)) : ''}
-							body={<T id={item.tooltip} html={true} />}
-							className={
-								(item.type === 'dropdown' ? 'toolbar__popover__dropdown' : 'toolbar__popover' ) + ' ' + 
-								(item.className === undefined ? '' : item.className)
-								}
-						>
-							{item.type === 'dropdown'
-								? <DropdownList label={item.label} elements={item.elements} onChange={item.onChange} value={item.value} />
-								: <span onClick={e => {
-									e.preventDefault();
-									e.stopPropagation();
+				{groups.map((group, gIndex) => (
+					group.items.map((item, iIndex) => (
+                        item.type === 'separator' // render separators
+                            ? <span key={`sep-${gIndex}-${iIndex}`} className="toolbar__separator" />
+							: <Popover
+								key={`item-${gIndex}-${iIndex}`}
+								trigger={['hover', 'focus']}
+								placement={item.type === 'dropdown' ? 'top' : 'bottom'}
+								title={item.tooltipTitle ? String(t(item.tooltipTitle)) : ''}
+								body={<T id={item.tooltip} html={true} />}
+								className={
+									(item.type === 'dropdown' ? 'toolbar__popover__dropdown' : 'toolbar__popover' ) + ' ' + 
+									(item.className === undefined ? '' : item.className)
+									}
+							>
+								{item.type === 'dropdown'
+									? <DropdownList label={item.label} elements={item.elements} onChange={item.onChange} value={item.value} />
+									: <span onClick={e => {
+										e.preventDefault();
+										e.stopPropagation();
 
-									item.onClick(item);
-								}}>{item.label}</span>
-							}
-						</Popover>
+										item.onClick(item);
+									}}>{item.label}</span>
+								}
+							</Popover>
 					))
 				))}
 			</div>
