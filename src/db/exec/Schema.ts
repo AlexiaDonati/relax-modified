@@ -170,7 +170,6 @@ export class Schema {
 		return conflicts;
 	}
 
-	// TODO ALEXIA modify this to remove relAlias
 	getColumnIndexArray(name: string | number, relAlias: string | null) {
 		let index;
 		if (typeof (name) === 'string') {
