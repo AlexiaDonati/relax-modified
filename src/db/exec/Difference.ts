@@ -41,18 +41,22 @@ export class Difference extends RANodeBinary {
 		const orgA = this.getChild().getResult(doEliminateDuplicateRows, session);
 		const orgB = this.getChild2().getResult(doEliminateDuplicateRows, session);
 		res.setSchema(this._schema);
+
+		const rowsA = orgA.getRowsMappedToSchema(this._schema);
+		const rowsB = orgB.getRowsMappedToSchema(this._schema);
+		
 		let paintedIndexes: (number)[] = [];
 
 		// copy
 		for (let i = 0; i < orgA.getNumRows(); i++) {
-			const rowA = orgA.getRow(i);
+			const rowA = rowsA[i];
 			let notFound = true;
 			for (let j = 0; j < orgB.getNumRows(); j++) {
 				if (paintedIndexes.indexOf(j) !== -1) {
 					continue;
 				}
 
-				if (Table.rowEqualsRow(rowA, orgB.getRow(j))) {
+				if (Table.rowEqualsRow(rowA, rowsB[j])) {
 					notFound = false;
 					paintedIndexes.push(j);
 					break;
@@ -75,8 +79,17 @@ export class Difference extends RANodeBinary {
 		this._child.check();
 		this._child2.check();
 
+		/*
 		if (this._child.getSchema().equalsTypeOnly(this._child2.getSchema()) === false) {
 			this.throwExecutionError(i18n.t('db.messages.exec.error-schemas-not-unifiable', {
+				schemaA: this._child.getSchema(),
+				schemaB: this._child2.getSchema(),
+			}));
+		}
+		*/
+
+		if (this._child.getSchema().equals(this._child2.getSchema()) === false) {
+			this.throwExecutionError(i18n.t('db.messages.exec.error-schemas-not-unifiable-name', {
 				schemaA: this._child.getSchema(),
 				schemaB: this._child2.getSchema(),
 			}));

@@ -43,15 +43,19 @@ export class Intersect extends RANodeBinary {
 		const numRowsA = orgA.getNumRows();
 		const numRowsB = orgB.getNumRows();
 		const numCols = orgA.getNumCols();
+
+		const rowsA = orgA.getRowsMappedToSchema(this._schema);
+		const rowsB = orgB.getRowsMappedToSchema(this._schema);
+
 		let paintedIndexes: (number)[] = [];
 		for (let i = 0; i < numRowsA; i++) {
-			const rowA = orgA.getRow(i);
+			const rowA = rowsA[i];
 			for (let j = 0; j < numRowsB; j++) {
 				if (paintedIndexes.indexOf(j) !== -1) {
 					continue;
 				}
 
-				const rowB = orgB.getRow(j);
+				const rowB = rowsB[j];
 				let equals = true;
 
 				for (let k = 0; k < numCols; k++) {
@@ -80,8 +84,17 @@ export class Intersect extends RANodeBinary {
 		this._child.check();
 		this._child2.check();
 
+		/*
 		if (this._child.getSchema().equalsTypeOnly(this._child2.getSchema()) === false) {
 			this.throwExecutionError(i18n.t('db.messages.exec.error-schemas-not-unifiable', {
+				schemaA: this._child.getSchema(),
+				schemaB: this._child2.getSchema(),
+			}));
+		}
+		*/
+
+		if (this._child.getSchema().equals(this._child2.getSchema()) === false) {
+			this.throwExecutionError(i18n.t('db.messages.exec.error-schemas-not-unifiable-name', {
 				schemaA: this._child.getSchema(),
 				schemaB: this._child2.getSchema(),
 			}));

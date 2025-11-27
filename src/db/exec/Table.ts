@@ -275,4 +275,43 @@ export class Table {
 		relation.addRows(this.getRows());
 		return relation;
 	}
+
+	getRowsMappedToSchema(targetSchema: Schema): Tuple[] {
+
+		// build column mapping array
+		const colMapping: number[] = [];
+		for (let i = 0; i < targetSchema.getSize(); i++) {
+			const col = targetSchema.getColumn(i); // get column at index i in target schema
+
+			const sourceIndex = this._schema.getColumnIndex(col.getName(), null); // get index in source schema
+
+			colMapping.push(sourceIndex); // store source index at index i of target schema
+		}
+
+		println: console.log('colMapping:', colMapping);
+
+		// map rows to target schema
+		const mappedRows: Tuple[] = [];
+		for (let i = 0; i < this._rows.length; i++) {
+			const originalRow = this._rows[i];
+
+			// maps row i to target schema
+			const mappedRow: Tuple = [];
+			for (let j = 0; j < colMapping.length; j++) {
+
+				const sourceIndex = colMapping[j]; // get source index for target column j
+				if (sourceIndex === -1) {
+					mappedRow.push(null);
+				} else {
+					mappedRow.push(originalRow[sourceIndex]); // map value from source row to target row
+				}
+			}
+
+			mappedRows.push(mappedRow); // add mapped row to result array
+
+			println: console.log('originalRow:', originalRow, 'mappedRow:', mappedRow);
+		}
+		
+		return mappedRows;
+	}
 }

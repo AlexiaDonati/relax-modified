@@ -218,6 +218,7 @@ export class Schema {
 		return this._types[index];
 	}
 
+	/*
 	equals(schemaB: Schema) {
 		if (this.equalsTypeOnly(schemaB) === false) {
 			return false;
@@ -230,6 +231,32 @@ export class Schema {
 		}
 
 		return true;
+	}
+	*/
+
+	equals(schemaB: Schema) {
+		if (this._size !== schemaB._size) {
+			return false; // different number of columns
+		}
+
+		for (let i = 0; i < this._size; i++) { // schemaA
+			let foundMatch = false;
+
+			for (let j = 0; j < schemaB._size; j++) { // schemaB
+				if (this._names[i] === schemaB._names[j]) { // name matches
+					if (this._types[i] === schemaB._types[j]) { // type matches
+						foundMatch = true; 
+						break; 
+					}
+				}
+			}
+
+			if (foundMatch === false) {
+				return false; // no matching column found for column i
+			}
+		}
+
+		return true; // all columns have a matching column
 	}
 
 	equalsTypeOnly(schemaB: Schema) {

@@ -45,8 +45,15 @@ export class Union extends RANodeBinary {
 		res.setSchema(this._schema);
 
 		// copy
-		res.addRows(orgA.getRows());
-		res.addRows(orgB.getRows());
+		//res.addRows(orgA.getRows());
+		//res.addRows(orgB.getRows());
+
+		// match the rows of both tables to the output schema
+		const rowsA = orgA.getRowsMappedToSchema(this._schema);
+		const rowsB = orgB.getRowsMappedToSchema(this._schema);
+		
+		res.addRows(rowsA);
+		res.addRows(rowsB);
 
 		if (doEliminateDuplicateRows === true) {
 			res.eliminateDuplicateRows();
@@ -59,8 +66,17 @@ export class Union extends RANodeBinary {
 		this._child.check();
 		this._child2.check();
 
+		/*
 		if (this._child.getSchema().equalsTypeOnly(this._child2.getSchema()) === false) {
 			this.throwExecutionError(i18n.t('db.messages.exec.error-schemas-not-unifiable', {
+				schemaA: this._child.getSchema(),
+				schemaB: this._child2.getSchema(),
+			}));
+		}
+		*/
+
+		if (this._child.getSchema().equals(this._child2.getSchema()) === false) {
+			this.throwExecutionError(i18n.t('db.messages.exec.error-schemas-not-unifiable-name', {
 				schemaA: this._child.getSchema(),
 				schemaB: this._child2.getSchema(),
 			}));
