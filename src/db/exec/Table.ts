@@ -139,18 +139,33 @@ export class Table {
 			throw new Error('can not compare');
 		}
 
+		// TODO Alexia : more flexible schema comparison
+
 		// compare schema
 		if (this._schema.equals(table._schema) === false) {
 			return false;
 		}
 
+		// prepare new tables for comparison to avoid modifying the original tables
+		const tableA = this.copy(); 
+		const tableB = new Table(); 
+		tableB.setSchema(this.getSchema().copy());
+
+		// map the other table's rows to this table's schema for comparison
+		const otherRows = table.getRowsMappedToSchema(this.getSchema());
+		tableB.addRows(otherRows);
+
+		// sort rows the same way in both tables for comparison
+		tableA.sort();
+		tableB.sort();	
+
 		// compare rows
-		if (this._rows.length !== table._rows.length) {
+		if (tableA._rows.length !== tableB._rows.length) {
 			return false;
 		}
 
-		for (let i = 0; i < this._rows.length; i++) {
-			if (Table.rowEqualsRow(this._rows[i], table._rows[i]) === false) {
+		for (let i = 0; i < tableA._rows.length; i++) {
+			if (Table.rowEqualsRow(tableA._rows[i], tableB._rows[i]) === false) {
 				return false;
 			}
 		}
@@ -173,10 +188,7 @@ export class Table {
 		}
 	}
 
-	sort(
-		sortByColumnIndicesArg?: number[],
-		sortAscendingArg?: boolean[],
-	) {
+	sort(sortByColumnIndicesArg?: number[], sortAscendingArg?: boolean[]) {
 		const size = this.getNumCols();
 
 		// initialize
@@ -288,8 +300,6 @@ export class Table {
 			colMapping.push(sourceIndex); // store source index at index i of target schema
 		}
 
-		println: console.log('colMapping:', colMapping);
-
 		// map rows to target schema
 		const mappedRows: Tuple[] = [];
 		for (let i = 0; i < this._rows.length; i++) {
@@ -308,8 +318,6 @@ export class Table {
 			}
 
 			mappedRows.push(mappedRow); // add mapped row to result array
-
-			println: console.log('originalRow:', originalRow, 'mappedRow:', mappedRow);
 		}
 		
 		return mappedRows;
