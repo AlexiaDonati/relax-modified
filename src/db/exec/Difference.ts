@@ -98,4 +98,15 @@ export class Difference extends RANodeBinary {
 		// schema of diff is the left schema
 		this._schema = this._child.getSchema().copy();
 	}
+
+	equalsChildren(node: RANodeBinary): boolean {
+		if(node instanceof Difference) { // same type
+			// the order of the children matters for the difference operation
+			return this._child.equals(node.getChild()) // same child
+				&& this._child2.equals(node.getChild2()); // same child2
+		}
+		else {
+			return false;
+		}
+	}
 }

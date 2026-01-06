@@ -601,4 +601,30 @@ export abstract class Join extends RANodeBinary {
 				return cond;
 		}
 	}
+
+	/**
+	 * 
+	 * @param node the node to compare with
+	 */
+	abstract equalsJoin(node: RANode): boolean;
+
+	equalsChildren(node: RANodeBinary): boolean {
+		if (node instanceof Join) { // same type
+			if(this._joinConditionOptions.type === node._joinConditionOptions.type) { // same condition type
+				if(this._joinConditionOptions.type === 'natural') { // natural join
+					return this.equalsJoin(node); // join specific equality check
+				}
+				else { // theta join
+					if(this._joinConditionBooleanExpr === null || node._joinConditionBooleanExpr === null) {
+						throw new Error(`check not called`);
+					}
+
+					if(this._joinConditionBooleanExpr.equals(node._joinConditionBooleanExpr)) { // same join condition
+						return this.equalsJoin(node); // join specific equality check
+					}
+				}
+			}
+		}
+		return false;
+	}
 }

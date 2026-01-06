@@ -85,4 +85,15 @@ export class Union extends RANodeBinary {
 		// schema of union is the left schema
 		this._schema = this._child.getSchema().copy();
 	}
+
+	equalsChildren(node: RANodeBinary): boolean {
+		if (node instanceof Union) { // same type
+			// the order of the children does not matter for the union operation
+			return (this._child.equals(node.getChild()) && this._child2.equals(node.getChild2())) 
+				|| (this._child.equals(node.getChild2()) && this._child2.equals(node.getChild())); 
+		}
+		else {
+			return false;
+		}
+	}
 }

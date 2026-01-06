@@ -156,6 +156,12 @@ export abstract class ValueExpr {
 	setWrappedInParentheses(wrappedInParentheses: boolean) {
 		this._wrappedInParentheses = wrappedInParentheses;
 	}
+
+	/**
+	 * checks wether this expression is equal to another one
+	 * @param node the expression to compare with
+	 */
+	abstract equals(node: ValueExpr): boolean;
 }
 
 
@@ -253,6 +259,16 @@ export class ValueExprColumnValue extends ValueExpr {
 			return schemaB.getType(index - schemaA.getSize());
 		}
 		return schemaA.getType(index);
+	}
+
+	equals(node: ValueExpr): boolean {
+		if (node instanceof ValueExprColumnValue) { // same type
+			return this._name === node._name // same name
+				&& this._relAlias === node._relAlias; // same relAlias
+		}
+		else {
+			return false;
+		}
 	}
 }
 
@@ -1276,6 +1292,33 @@ export class ValueExprGeneric extends ValueExpr {
 		}
 		else {
 			return (getFormula.call(this)).toString();
+		}
+	}
+
+	equals(other: ValueExpr): boolean {
+		if (other instanceof ValueExprGeneric) {
+			if (this._dataType !== other._dataType) { // check data type
+				return false;
+			}
+			
+			if (this._func !== other._func) { // check function
+				return false;
+			}
+
+			if (this._args.length !== other._args.length) { // check number of arguments
+				return false;
+			}
+
+			// the order of arguments matters
+			for (let i = 0; i < this._args.length; i++) { // check arguments
+				if (!this._args[i].equals(other._args[i])) {
+					return false;
+				}
+			}
+			return true;
+		}
+		else {
+			return false;
 		}
 	}
 }

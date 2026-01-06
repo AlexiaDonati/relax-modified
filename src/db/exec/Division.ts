@@ -86,4 +86,15 @@ export class Division extends RANodeBinary {
 		);
 		this._delegate.check();
 	}
+
+	equalsChildren(node: RANodeBinary): boolean {
+		if (node instanceof Division) { // same type
+			// the order of the children matters for the division operation
+			return this._child.equals(node.getChild()) // same child
+				&& this._child2.equals(node.getChild2()); // same child2
+		}
+		else {
+			return false;
+		}
+	}
 }

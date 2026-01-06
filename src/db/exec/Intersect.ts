@@ -103,4 +103,15 @@ export class Intersect extends RANodeBinary {
 		// schema is the left schema
 		this._schema = this._child.getSchema().copy();
 	}
+
+	equalsChildren(node: RANodeBinary): boolean {
+		if (node instanceof Intersect) { // same type
+			// the order of the children does not matter for the intersect operation
+			return (this._child.equals(node.getChild()) && this._child2.equals(node.getChild2())) 
+				|| (this._child.equals(node.getChild2()) && this._child2.equals(node.getChild())); 
+		}
+		else {
+			return false;
+		}
+	}
 }

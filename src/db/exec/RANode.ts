@@ -171,6 +171,12 @@ export abstract class RANode {
 			func(node.getChild2());
 		}
 	}
+
+	/**
+	 * checks if this node is equal to the given node
+	 * @param node the node to compare with
+	 */
+	abstract equals(node: RANode): boolean; 
 }
 
 export abstract class RANodeNullary extends RANode {
@@ -187,6 +193,15 @@ export abstract class RANodeNullary extends RANode {
 				</span>
 			${wrap ? ')' : ''}`
 		);
+	}
+
+	equals(node: RANode): boolean {
+		if (node instanceof RANodeNullary) { // same type
+			return this._functionName === node._functionName; // same function
+		}
+		else {
+			return false;
+		}
 	}
 }
 
@@ -223,6 +238,16 @@ export abstract class RANodeUnary extends RANode {
 				</span>
 			${wrap ? ')' : ''}`
 		);
+	}
+
+	equals(node: RANode): boolean {
+		if(node instanceof RANodeUnary) { // same type
+			return this._functionName === node._functionName // same function
+				&& this._child.equals(node.getChild()); // same child
+		}
+		else {
+			return false;
+		}
 	}
 }
 
@@ -270,5 +295,21 @@ export abstract class RANodeBinary extends RANode {
 				</span>
 			${wrap ? ')' : ''}`
 		);
+	}
+
+	/**
+	 * checks if the children of this node are equal to the children of the given node
+	 * @param node the node to compare with
+	 */
+	abstract equalsChildren(node: RANodeBinary): boolean;
+
+	equals(node: RANode): boolean {
+		if (node instanceof RANodeBinary) { // same type
+			return this._functionName === node._functionName // same function
+				&& this.equalsChildren(node); // same children
+		}
+		else {
+			return false;
+		}
 	}
 }

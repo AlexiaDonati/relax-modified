@@ -68,4 +68,14 @@ export class LeftOuterJoin extends Join {
 	getResult(doEliminateDuplicateRows: boolean = true, session?: Session) {
 		return super._getResult(doEliminateDuplicateRows, session);
 	}
+
+	equalsJoin(node: RANode): boolean {
+		if (node instanceof LeftOuterJoin) { // same type
+			// the order of the children does matter for the left outer join operation
+			return this._child.equals(node.getChild()) && this._child2.equals(node.getChild2());
+		}
+		else {
+			return false;
+		}	
+	}
 }

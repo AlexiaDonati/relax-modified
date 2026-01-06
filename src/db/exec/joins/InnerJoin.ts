@@ -59,4 +59,15 @@ export class InnerJoin extends Join {
 	getResult(doEliminateDuplicateRows: boolean = true, session?: Session) {
 		return super._getResult(doEliminateDuplicateRows, session);
 	}
+
+	equalsJoin(node: RANode): boolean {
+		if (node instanceof InnerJoin) { // same type
+			// the order of the children does not matter for the inner join operation
+			return (this._child.equals(node.getChild()) && this._child2.equals(node.getChild2()))
+				|| (this._child.equals(node.getChild2()) && this._child2.equals(node.getChild()));
+		}
+		else {
+			return false;
+		}	
+	}
 }

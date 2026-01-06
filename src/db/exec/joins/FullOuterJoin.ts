@@ -102,4 +102,15 @@ export class FullOuterJoin extends Join {
 
 		return resultTable;
 	}
+
+	equalsJoin(node: RANode): boolean {
+		if (node instanceof FullOuterJoin) { // same type
+			// the order of the children does not matter for the full outer join operation
+			return (this._child.equals(node.getChild()) && this._child2.equals(node.getChild2()))
+				|| (this._child.equals(node.getChild2()) && this._child2.equals(node.getChild()));
+		}
+		else {
+			return false;
+		}
+	}
 }
