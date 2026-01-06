@@ -22,13 +22,16 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Button, DropdownItem, DropdownMenu, DropdownToggle, Modal, ModalBody, ModalFooter, ModalHeader, Nav, NavItem, NavLink, TabContent, TabPane, UncontrolledDropdown } from 'reactstrap';
 import { GroupRelationList } from '../components/groupRelationList';
 import { MenuConnected } from '../components/menu';
+import { MenuExerciseConnected } from '../components/menuExercise';
 import { Navigation } from '../components/navigation';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { Exercise } from '../store/exercise';
 require('./calculator.scss');
 
 
 type Props = {
 	group: Group,
+	exercise: Exercise,
 	locale: store.State['session']['locale'],
 	setDraft(draft: Group): void,
 };
@@ -36,6 +39,7 @@ type Props = {
 type State = {
 	activeTab: 'relalg' | 'bagalg' | 'trc' | 'sql' | 'group',
 	datasetModal: boolean,
+	exerciseModal: boolean,
 	relationModal: boolean,
 };
 
@@ -55,12 +59,14 @@ export class Calculator extends React.Component<Props, State> {
 		this.state = {
 			activeTab: 'relalg',
 			datasetModal: false,
+			exerciseModal: false,
 			relationModal: false,
 		};
 		
 
 		this.getCurrentEditor = this.getCurrentEditor.bind(this);
 		this.toggleDatasetModal = this.toggleDatasetModal.bind(this);
+		this.toggleExerciseModal = this.toggleExerciseModal.bind(this);
 		this.insertRelationToggle = this.insertRelationToggle.bind(this);
 		this.loadGroupEditor = this.loadGroupEditor.bind(this);
 	}
@@ -68,6 +74,11 @@ export class Calculator extends React.Component<Props, State> {
 	private toggleDatasetModal() {
 		this.setState({
 			datasetModal: !this.state.datasetModal,
+		});
+	}
+	private toggleExerciseModal() {
+		this.setState({
+			exerciseModal: !this.state.exerciseModal,
 		});
 	}
 	private insertRelationToggle() {
@@ -124,16 +135,19 @@ example,  42
 	}
 
 	render() {
-		const { group, locale } = this.props;
+		const { group, exercise, locale } = this.props;
 		const { activeTab } = this.state;
 
 		return (
 			<div className="view-max">
 			<Navigation></Navigation>
+
 			<div className="calculator">
+				
 				<ToastContainer enableMultiContainer position={toast.POSITION.TOP_RIGHT} />
 				<div className="row">
-					<div className="d-none d-xs-block d-sm-block d-md-block col-lg-1 col-xl-2"></div>
+					{/* <div className="d-none d-xs-block d-sm-block d-md-block col-lg-1 col-xl-2"></div> */}
+					
 					<div className="groups-container col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2">
 						<button className="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" onClick={this.toggleDatasetModal} style={{ width: '100%', textAlign: 'left', textOverflow: 'ellipsis', overflow: 'hidden' }}>
 							<span>Select DB ({translateHeader(group.groupName, locale)})</span>
@@ -154,6 +168,7 @@ example,  42
 							/>
 						</div>
 					</div>
+
 					<div className="calculator-container col-xs-12 col-sm-12 col-md-12 col-lg-8 col-xl-6">
 						<Nav tabs>
 							<UncontrolledDropdown nav inNavbar className="showOnSM">
@@ -223,6 +238,7 @@ example,  42
 							<TabPane tabId="relalg">
 								<EditorRelalg
 									group={group}
+									exercise={exercise}
 									ref={this.refEditorRelalg}
 									relInsertModalToggle={this.insertRelationToggle}
 								/>
@@ -255,8 +271,22 @@ example,  42
 								/>
 							</TabPane>
 						</TabContent>
+					</div>
 
+					<div className="groups-container col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2">
+						<button className="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" onClick={this.toggleExerciseModal} style={{ width: '100%', textAlign: 'left', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+							<span>Select Exercise</span>
+							<span className="caret" style={{ display: 'block', position: 'absolute', top: '50%', right: '10px' }}></span>
+						</button>
 
+						<div>
+							<div>
+								<span> Exercise definition: </span>	{exercise.definition}
+							</div>
+							<div>
+								<span> Reference solution: </span> {exercise.reference}
+							</div>
+						</div>
 					</div>
 				</div>
 
@@ -269,6 +299,16 @@ example,  42
 					</ModalBody>
 					<ModalFooter>
 						<Button color="secondary" onClick={this.toggleDatasetModal}>{t('calc.result.modal.close')}</Button>
+					</ModalFooter>
+				</Modal>
+
+				<Modal isOpen={this.state.exerciseModal} toggle={this.toggleExerciseModal}>
+					<ModalHeader toggle={this.toggleExerciseModal}>TEST EXERCISE</ModalHeader>
+					<ModalBody>
+						<MenuExerciseConnected exerciseLoaded={() => { this.setState({ exerciseModal: false }); }} />
+					</ModalBody>
+					<ModalFooter>
+						<Button color="secondary" onClick={this.toggleExerciseModal}>{t('calc.result.modal.close')}</Button>
 					</ModalFooter>
 				</Modal>
 
@@ -292,6 +332,7 @@ example,  42
 				</Modal>
 
 			</div>
+
 			</div>
 		);
 	}

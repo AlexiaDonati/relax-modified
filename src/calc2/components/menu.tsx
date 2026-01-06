@@ -87,7 +87,7 @@ export class Menu extends React.Component<Props> {
 									<ul>
 										{groups.map((group: any, i: any) => {
 											const { groupName, groupInfo } = group;
-											const path = `/relax/calc/${groupInfo.source}/${groupInfo.id}/${groupInfo.filename}/${groupInfo.index}`;
+											const path = `/relax/calc/group/${groupInfo.source}/${groupInfo.id}/${groupInfo.filename}/${groupInfo.index}`;
 
 											return (
 												<li key={path} className={classNames({
@@ -104,7 +104,7 @@ export class Menu extends React.Component<Props> {
 					</div>
 					<div className="col-md-6 align-text-top align-top">
 						<h4><T id="calc.menu.load-gist-headline" /></h4>
-						<input type="text" className="form-control gist-load-input" placeholder="" data-i18n="[placeholder]calc.menu.load-gist-insert-placeholder" size={32} onChange={(event) => { this.gistLink = '/relax/calc/gist/' + event.target.value; }} />
+						<input type="text" className="form-control gist-load-input" placeholder="" data-i18n="[placeholder]calc.menu.load-gist-insert-placeholder" size={32} onChange={(event) => { this.gistLink = '/relax/calc/group/gist/' + event.target.value; }} />
 						<button onClick={() => {document.location.href = this.gistLink; this.props.datasetLoaded(); }} type="button" className="fullWidthBtn btn btn-secondary gist-load-btn"><T id="calc.menu.load-gist-button" /></button>
 
 						<hr />
@@ -113,7 +113,7 @@ export class Menu extends React.Component<Props> {
 							{
 								recentlyUsedGroups.reverse().map((el: any) => 
 									<li key={el.name}>
-										<NavLink to={'/relax/calc/gist/'+el.group.groupInfo.id} onClick={()=>{this.props.datasetLoaded(); document.location.href = '/relax/calc/gist/'+el.group.groupInfo.id; }}>{el.name}</NavLink>
+										<NavLink to={'/relax/calc/group/gist/'+el.group.groupInfo.id} onClick={()=>{this.props.datasetLoaded(); document.location.href = '/relax/calc/group/gist/'+el.group.groupInfo.id; }}>{el.name}</NavLink>
 									</li>,
 								)
 							}
