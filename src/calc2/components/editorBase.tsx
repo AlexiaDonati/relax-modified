@@ -11,7 +11,7 @@ import { HistoryEntry } from 'calc2/components/history';
 import { Group as ToolbarGroup, Item, Toolbar } from 'calc2/components/toolbar';
 import { LanguageKeys, t, T } from 'calc2/i18n';
 import { Group } from 'calc2/store/groups';
-import classNames from 'classnames';
+import classnames from 'classnames';
 import * as CodeMirror from 'codemirror';
 import 'codemirror/addon/hint/show-hint';
 import { RANode, RANodeBinary, RANodeUnary } from 'db/exec/RANode';
@@ -19,7 +19,7 @@ import { forEachPreOrder } from 'db/translate/utils';
 import * as React from 'react';
 import { findDOMNode } from 'react-dom';
 import { toast } from 'react-toastify';
-import { Button, Modal, ModalBody, ModalFooter, ModalHeader, Input } from 'reactstrap';
+import { Button, Modal, ModalBody, ModalFooter, ModalHeader, Input, Nav, NavItem, NavLink, TabContent, TabPane} from 'reactstrap';
 import { HotTable } from '@handsontable/react';
 import * as ReactDOM from 'react-dom';
 import memoize from 'memoize-one';
@@ -27,11 +27,12 @@ import html2canvas from 'html2canvas';
 import { 
 	faHistory,
 	faPlayCircle,
-  faUpload,
+  	faUpload,
 	faDownload,
-  faCheckCircle,
-  faTimesCircle,
-  faPlay,
+	faCheckCircle,
+	faTimesCircle,
+	faPlay,
+	faLightbulb,
 	faTable,
 	faFileDownload,
 	faImage,
@@ -431,7 +432,7 @@ const ExecutionAlert: React.FunctionComponent<{ alert: Alert, editor: CodeMirror
 	}[type];
 	return (
 		<div
-			className={classNames('alert ', {
+			className={classnames('alert ', {
 				'alert-danger': type === 'error',
 				'alert-warning': type === 'warning',
 			})}
@@ -490,7 +491,7 @@ type Props = {
 	linterFunction(self: EditorBase, editor: CodeMirror.Editor, text: string): string[],
 	/** */
 	getHintsFunction(): string[],
-	
+
 	tab: 'relalg' | 'bagalg' | 'trc' | 'sql' | 'group',
 
 	enableInlineRelationEditor: boolean,
@@ -517,6 +518,8 @@ type Props = {
 	exampleBags?: string,
 
 	exampleRA?: string
+
+	exerciseReference?: string,
 };
 
 type State = {
@@ -528,16 +531,19 @@ type State = {
 	execErrors: Alert[],
 	isSelectionSelected: boolean,
 	execSuccessful: boolean,
+	verifySuccessful: boolean,
 	isExecutionDisabled: boolean,
 	execResult: JSX.Element | null,
 	relationEditorName: string,
 	replSelStart: any,
 	replSelEnd: any,
 	queryResult: any,
+	verifyResult: any,
 	execTime: any,
 	addedExampleSqlQuery: boolean,
 	addedExampleBagsQuery: boolean,
-	addedExampleRAQuery: boolean
+	addedExampleRAQuery: boolean,
+	activeTab: 'exec' | 'verify',
 };
 
 
@@ -685,6 +691,7 @@ class Relation {
 
 const gutterClass = 'CodeMirror-table-edit-markers';
 const eventExecSuccessfulName = 'editor.execSuccessful';
+const eventVerifySuccessfulName = 'editor.verifySuccessful';
 
 
 export class EditorBase extends React.Component<Props, State> {
@@ -782,6 +789,7 @@ export class EditorBase extends React.Component<Props, State> {
 			history: [],
 			isSelectionSelected: false,
 			execSuccessful: false,
+			verifySuccessful: false,
 			execErrors: [],
 			isExecutionDisabled: false,
 			execResult: null,
@@ -791,10 +799,12 @@ export class EditorBase extends React.Component<Props, State> {
 			replSelStart: null,
 			replSelEnd: null,
 			queryResult: null,
+			verifyResult: null,
 			execTime: null,
 			addedExampleSqlQuery: false,
 			addedExampleBagsQuery: false,
-			addedExampleRAQuery: false
+			addedExampleRAQuery: false,
+			activeTab: 'exec',
 		};
 		this.toggle = this.toggle.bind(this);
 		this.inlineRelationEditorOk = this.inlineRelationEditorOk.bind(this);
@@ -810,6 +820,7 @@ export class EditorBase extends React.Component<Props, State> {
 
 		this.linter = this.linter.bind(this);
 		this.exec = this.exec.bind(this);
+		this.verify = this.verify.bind(this);
 		this.applyHistory = this.applyHistory.bind(this);
 		this.downloadEditorText = this.downloadEditorText.bind(this);
 		this.downloadQueryResult = this.downloadQueryResult.bind(this);
@@ -966,16 +977,19 @@ export class EditorBase extends React.Component<Props, State> {
 			editor,
 			history,
 			execSuccessful,
+			verifySuccessful,
 			isExecutionDisabled,
 			execResult,
 			execTime,
 			queryResult,
+			verifyResult,
 		} = this.state;
 		const {
 			toolbar,
 			disableHistory = false,
 			execButtonLabel,
 		} = this.props;
+		const { activeTab } = this.state;
 
 		return (
 			<div>
@@ -987,35 +1001,64 @@ export class EditorBase extends React.Component<Props, State> {
 					<div className="exec-errors">
 						{execErrors.map((alert, i) => <ExecutionAlert key={i} alert={alert} editor={editor} />)}
 					</div>
-					
 
 					<div className="input-buttons">
-						<button
-							type="button"
-							disabled={isExecutionDisabled}
-							className={classNames('btn btn-primary exec-button selection', {
-								'selection-selected': isSelectionSelected,
-								'btn-danger': execErrors.length > 0,
-								'btn-success': execSuccessful,
-								'disabled': isExecutionDisabled,
-							})}
-							onClick={() => {
-								if (!editor) {
-									console.warn(`editor not initialized yet`);
-									return;
+						<div style={{ float: 'left' }}>
+							<button
+								type="button"
+								disabled={isExecutionDisabled}
+								className={classnames('btn btn-primary exec-button selection', {
+									'selection-selected': isSelectionSelected,
+									'btn-danger': execErrors.length > 0,
+									'btn-success': execSuccessful,
+									'disabled': isExecutionDisabled,
+								})}
+								onClick={() => {
+									if (!editor) {
+										console.warn(`editor not initialized yet`);
+										return;
+									}
+									this.exec(editor.getDoc().somethingSelected());
+								}}
+							>
+								{!!execButtonLabel
+									? <span><FontAwesomeIcon icon={faPlayCircle  as IconProp} /> <T id={execButtonLabel} /></span>
+									: (
+										<>
+											<span className="glyphicon glyphicon-play"></span> 
+											<span className="query">
+												<FontAwesomeIcon icon={faPlay as IconProp} /> 
+												<T id="calc.editors.ra.button-execute-query" />
+											</span>
+											<span className="selection">
+												<T id="calc.editors.ra.button-execute-selection" />
+											</span>
+										</>
+									)
 								}
-								this.exec(editor.getDoc().somethingSelected());
-							}}
-						>
-							{!!execButtonLabel
-								? <span><FontAwesomeIcon icon={faPlayCircle  as IconProp} /> <T id={execButtonLabel} /></span>
-								: (
-									<>
-										<span className="glyphicon glyphicon-play"></span> <span className="query"><FontAwesomeIcon icon={faPlay as IconProp} /> <T id="calc.editors.ra.button-execute-query" /></span><span className="selection"><T id="calc.editors.ra.button-execute-selection" /></span>
-									</>
-								)
-							}
-						</button>
+							</button>
+
+							<button
+								type="button"
+								disabled={isExecutionDisabled}
+								className={classnames('btn btn-secondary verify-button', {
+									'btn-success': verifySuccessful,
+									'disabled': isExecutionDisabled,
+								})}
+								onClick={() => {
+									if (!editor) {
+										console.warn(`editor not initialized yet`);
+										return;
+									}
+									this.verify();
+								}}
+							>
+								<span className="query">
+									<FontAwesomeIcon icon={faLightbulb as IconProp} /> 
+									<span>Verify Query</span>
+								</span>
+							</button>
+						</div>
 
 						<div style={{ float: 'right' }}>
 							<div className="btn-group history-container">
@@ -1049,10 +1092,10 @@ export class EditorBase extends React.Component<Props, State> {
 									]
 										
 									}
-									/>
+								/>
 							</div>
 
-								{disableHistory
+							{disableHistory
 								? null
 								: (
 									<div className="btn-group history-container">
@@ -1063,11 +1106,6 @@ export class EditorBase extends React.Component<Props, State> {
 													<>
 														<small className="muted text-muted">{h.time.toLocaleTimeString()}</small>
 														<div>{h.code}</div>
-														{/*
-														// colorize the code
-														codeNode.addClass('colorize');
-														CodeMirror.colorize(codeNode, this.state.editor.getOption('mode'));
-													*/}
 													</>
 												),
 												value: h,
@@ -1079,7 +1117,39 @@ export class EditorBase extends React.Component<Props, State> {
 							}
 						</div>
 					</div>
-					<div className="exec-result">{execResult}</div>
+
+					<div>
+						<Nav tabs>
+							<NavItem>
+								<NavLink
+									className={classnames({ active: activeTab === 'exec' })}
+									onClick={() => { this.setState({ activeTab: 'exec' }); }}
+								>
+									<span className="hideOnSM">Execution</span>
+									<span className="showOnSM">Exec</span>
+								</NavLink>
+							</NavItem>
+							<NavItem>
+								<NavLink
+									className={classnames({ active: activeTab === 'verify' })}
+									onClick={() => { this.setState({ activeTab: 'verify' }); }}
+								>
+									<span className="hideOnSM">Verification</span>
+									<span className="showOnSM">Verify</span>
+								</NavLink>
+							</NavItem>
+						</Nav>
+
+						<TabContent activeTab={this.state.activeTab} className="tab-content-border">
+							<TabPane tabId="exec">
+								{execResult}
+							</TabPane>
+							<TabPane tabId="verify">
+								{verifyResult}
+							</TabPane>
+						</TabContent>
+					</div>
+					
 					<Modal isOpen={this.state.modal} toggle={this.toggle} className="showOnSM">
 						<ModalHeader toggle={this.toggle}>{t('calc.result.modal.title')}</ModalHeader>
 						<ModalBody>
@@ -1088,7 +1158,6 @@ export class EditorBase extends React.Component<Props, State> {
 							</div>
 						</ModalBody>
 						<ModalFooter>
-							<span></span>
 							<Button color="secondary" onClick={this.toggle}>{t('calc.result.modal.close')}</Button>
 						</ModalFooter>
 					</Modal>
@@ -1194,9 +1263,6 @@ export class EditorBase extends React.Component<Props, State> {
 		position: { line: number, ch: number } | undefined = undefined,
 		type: 'error' | 'warning',
 	) {
-		if (this.isMobile()) {
-
-		}
 		const { editor } = this.state;
 		const alert: Alert = {
 			type,
@@ -1225,6 +1291,7 @@ export class EditorBase extends React.Component<Props, State> {
 		this.clearExecutionAlerts();
 		this.setState({
 			execSuccessful: false,
+			verifySuccessful: false,
 		});
 	}
 
@@ -1258,9 +1325,7 @@ export class EditorBase extends React.Component<Props, State> {
 		editor.refresh();
 	}
 
-
 	downloadQueryResult($event: any) {
-
 		const mode = $event.currentTarget.getAttribute('data-id');
 		if(!mode) { return; }
 
@@ -1269,7 +1334,6 @@ export class EditorBase extends React.Component<Props, State> {
 			console.warn('no query result...');
 			return;
 		}
-
 
 		const generateCsv = (schema: any, rows: any) => {
 
@@ -1297,7 +1361,6 @@ export class EditorBase extends React.Component<Props, State> {
 		};
 
 		const filename = 'result.csv';
-
 
 		switch(mode) {
 			case 'jpg':
@@ -1357,7 +1420,6 @@ export class EditorBase extends React.Component<Props, State> {
 				return;	
 		}
 	}
-
 
 	downloadEditorText() {
 		let filename = 'query';
@@ -1468,7 +1530,6 @@ export class EditorBase extends React.Component<Props, State> {
 		}
 	}
 
-
 	getResultForCsv(activeNode: RANode) {
 		const { editor } = this.state;
 		if (!editor) {
@@ -1492,8 +1553,6 @@ export class EditorBase extends React.Component<Props, State> {
 		this.setState({
 			queryResult: result(activeNode, editor.getOption('mode') !== 'bagalg'),
 		});
-		
-	
 	}
 
 	genericHint(cm: CodeMirror.Editor) {
@@ -1565,13 +1624,15 @@ export class EditorBase extends React.Component<Props, State> {
 		};
 	}
 
-
 	exec(selectionOnly: boolean) {
+		this.setState({ activeTab: 'exec' });
+
 		const { editor } = this.state;
 		if (!editor) {
 			throw new Error(`editor not initialized yet`);
 		}
-		this.setState({
+
+		this.setState({ // show spinner while executing
 			execResult:
 				(<div className="spinner">
 					<div className="rect1"></div>
@@ -1580,47 +1641,178 @@ export class EditorBase extends React.Component<Props, State> {
 					<div className="rect4"></div>
 					<div className="rect5"></div>
 				</div>),
-		}, () => {
+		}, () => { // async to allow spinner to render
 			this.clearExecutionAlerts();
+
 			let query = '';
 			let offset = {
 				line: 0,
 				ch: 0,
 			};
+
 			if (selectionOnly !== true) { // execute whole text
 				query = editor.getValue();
-		
 			}
 			else { // execute selection
 				query = editor.getDoc().getSelection();
 				offset = editor.getDoc().getCursor('from');
 			}
+
 			if (query.length === 0) {
 				this.clearExecutionAlerts();
 				this.addExecutionError(t('editor.error-no-query-found'));
 			}
 			this.clearExecutionAlerts();
+
 			try {
 				const start = Date.now();
 				const { result } = this.props.execFunction(this, query, offset);
 				const end = Date.now() - start;
-				this.getResultForCsv(result.props.root);
-				this.setState({
+
+				this.setState({ // replace the spinner with the actual result
 					execResult: result,
 					execTime: end,
 				});
+
+				this.getResultForCsv(result.props.root); 
+				
 				const event = new CustomEvent(eventExecSuccessfulName, {
 					'detail': {
 						editor: this,
 					},
 				});
 				document.dispatchEvent(event);
-				this.toggle();
+
+				this.toggle(); 
 				return true;
 			}
 			catch (e) {
 				console.error(e, e.stack);
 				const error = EditorBase._generateErrorFromException(e, offset.line, offset.ch);
+				this.addExecutionError(error.message, error.codemirrorPositions ? error.codemirrorPositions.from : undefined);
+				if (this.props.enableInlineRelationEditor) {
+					this.clearInlineRelationMarkers();
+				}
+			}
+		});
+	}
+
+	verify() {	
+		this.setState({ activeTab: 'verify' });
+
+		const { editor } = this.state;
+		if (!editor) {
+			throw new Error(`editor not initialized yet`);
+		}
+
+		const event = new CustomEvent(eventVerifySuccessfulName, {
+			'detail': {
+				editor: this,
+			},
+		});
+		
+		this.setState({ // show spinner while verifying
+			verifyResult:
+				(<div className="spinner">
+					<div className="rect1"></div>
+					<div className="rect2"></div>
+					<div className="rect3"></div>
+					<div className="rect4"></div>
+					<div className="rect5"></div>
+				</div>),
+		}, () => { // async to allow spinner to render
+			this.clearExecutionAlerts();
+
+			// --- Query string comparison ---
+
+			let query = editor.getValue();
+			if (query.length === 0) {
+				this.addExecutionError(t('editor.error-no-query-found'));
+			}
+			this.clearExecutionAlerts();
+
+			let referenceQuery = this.props.exerciseReference || '';
+			if (referenceQuery.length === 0) {
+				this.addExecutionError(t('editor.error-no-query-found'));
+			}
+			this.clearExecutionAlerts();
+			
+			console.log("referenceQuery", referenceQuery);
+
+			if(query === referenceQuery) { // exact same syntax
+				this.setState({ verifyResult: "Queries string are identical" });
+
+				document.dispatchEvent(event);
+				this.toggle();
+				return true;
+			}
+			// else: continue with AST and result comparison
+
+			try {
+				// --- AST comparison ---
+					
+				// execute the student query
+				const execResult = this.props.execFunction(this, query, {line: 0, ch: 0}).result;
+
+				// execute the teacher query
+				const referenceResult = this.props.execFunction(this, referenceQuery, {line: 0, ch: 0}).result;
+				
+				if(execResult.props.root.equals(referenceResult.props.root)) { // equivalent syntax tree 
+					this.setState({ verifyResult: "ASTs are identical" });
+					
+					document.dispatchEvent(event);
+					this.toggle();
+					return true;
+				}
+				// else: continue with result comparison
+
+				// --- Result on the reference data ---
+
+				const result = memoize(
+					(node: RANode, doEliminateDuplicates: boolean) => {
+						try {
+							node.check();
+							return node.getResult(doEliminateDuplicates);
+						}
+						catch (e) {
+							console.error(e);
+							return null;
+						}
+					},
+				);
+
+				const queryResult = result(execResult.props.root, editor.getOption('mode') !== 'bagalg')
+				if(!queryResult) {
+					throw new Error(`could not compute result for the student query`);
+				}
+
+				const referenceQueryResult = result(referenceResult.props.root, editor.getOption('mode') !== 'bagalg')
+				if(!referenceQueryResult) {
+					throw new Error(`could not compute result for the reference query`);
+				}
+
+				if(!queryResult.equals(referenceQueryResult)) { // different results on reference data
+					this.setState({ verifyResult: "Results do not match on the reference dataset" });
+
+					document.dispatchEvent(event);
+					this.toggle();
+					return false;
+				}
+				// else: continue to perform tests since results may match by coincidence
+
+				// --- Further tests ---
+				// TODO ALEXIA : implement further tests (e.g., test on additional datasets, test on edge cases, etc.)
+				
+				// if all tests passed
+				this.setState({ verifyResult: "Results passed all tests in place" });
+
+				document.dispatchEvent(event);
+				this.toggle();
+				return true;
+			}
+			catch (e) {
+				console.error(e, e.stack);
+				const error = EditorBase._generateErrorFromException(e, 0, 0);
 				this.addExecutionError(error.message, error.codemirrorPositions ? error.codemirrorPositions.from : undefined);
 				if (this.props.enableInlineRelationEditor) {
 					this.clearInlineRelationMarkers();
