@@ -9,6 +9,7 @@ import { Result } from 'calc2/components/result';
 import { Item } from 'calc2/components/toolbar';
 import { t, T } from 'calc2/i18n';
 import { Group } from 'calc2/store/groups';
+import { Exercise } from 'calc2/store/exercise';
 import * as CodeMirror from 'codemirror';
 import { Relation } from 'db/exec/Relation';
 import { AutoreplaceOperatorsMode, parseRelalg, queryWithReplacedOperatorsFromAst, relalgFromRelalgAstRoot, replaceVariables } from 'db/relalg';
@@ -27,6 +28,8 @@ export const KEYWORDS_RELALG = [
 
 type Props = {
 	group: Group,
+	exercise: Exercise,
+
 	relInsertModalToggle: Function,
 };
 type State = {
@@ -62,6 +65,7 @@ export class EditorRelalg extends React.Component<Props, State> {
 
 		return (
 			<EditorBase
+				exerciseReference = {this.props.exercise.reference}
 				exampleRA={group.exampleRA}
 				exampleBags={group.exampleBags}
 				exampleSql={group.exampleSQL}
