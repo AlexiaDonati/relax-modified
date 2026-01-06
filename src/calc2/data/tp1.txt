@@ -1,0 +1,7 @@
+exercise: Join
+description: "Perform a join between relation R and S"
+reference: "R⨝S"
+
+exercise: Union
+description: "Perform an union between relation S and T"
+reference: "S∪T"

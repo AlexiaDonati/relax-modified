@@ -7,8 +7,10 @@
 import * as redux from 'redux';
 import { applyMiddleware, compose, createStore } from 'redux';
 import createSagaMiddleware from 'redux-saga';
+
 import * as groups from './groups';
 import * as session from './session';
+import * as exercise from './exercise';
 
 
 export type Store = redux.Store<State>;
@@ -17,11 +19,13 @@ export type State = {
 	version: '1',
 	session: session.State,
 	groups: groups.State,
+	exercises: exercise.State,
 };
 
 export type Action = (
 	| groups.Action
 	| session.Action
+	| exercise.Action
 );
 
 function reduce(oldState: State | undefined, action: Action): State {
@@ -30,6 +34,7 @@ function reduce(oldState: State | undefined, action: Action): State {
 			version: '1',
 			session: session.reduce(undefined, action),
 			groups: groups.reduce(undefined, action),
+			exercises: exercise.reduce(undefined, action),
 		};
 	}
 
@@ -37,6 +42,7 @@ function reduce(oldState: State | undefined, action: Action): State {
 		version: oldState.version,
 		session: session.reduce(oldState.session, action), // TODO: session reducer
 		groups: groups.reduce(oldState.groups, action),
+		exercises: exercise.reduce(oldState.exercises, action),
 	};
 
 	// exec child reducers
@@ -64,6 +70,7 @@ export const store: Store = createStore<State, Action, {}, {}>(
 	composeEnhancers(applyMiddleware(sagaMiddleware)),
 );
 
-
 // run the saga(s)
 sagaMiddleware.run(groups.rootSaga);
+
+sagaMiddleware.run(exercise.rootSaga);
