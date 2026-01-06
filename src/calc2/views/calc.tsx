@@ -7,19 +7,24 @@
 import { Calculator } from 'calc2/components/calculator';
 import * as store from 'calc2/store';
 import { Group, GROUPS_LOAD_REQUEST, GROUP_SET_DRAFT } from 'calc2/store/groups';
+import { EXERCISES_LOAD_REQUEST } from '../store/exercise';
+
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Api } from './api';
 import queryString from 'query-string'
 
+
 type Props = RouteComponentProps<{
+	loadType: string,
 	source: string,
 	id: string,
 	filename: string,
 	index: string,
 }> & {
 	groups: store.State['groups'],
+	exercises: store.State['exercises'],
 	locale: store.State['session']['locale'],
 	params: any,
 	setDraft(draft: Group): void,
@@ -30,6 +35,13 @@ type Props = RouteComponentProps<{
 		index: number,
 		maintainer: string,
 		maintainerGroup: string,
+	): void,
+	loadExercise(
+		source: EXERCISES_LOAD_REQUEST['source'],
+		id: string,
+		filename: string,
+		index: number,
+		maintainer: string,
 	): void,
 };
 
@@ -69,7 +81,13 @@ export class Calc extends React.Component<Props> {
 		) {
 			// change/load
 			this.init = true;
-			this.loadGroup(this.props);
+
+			if(params.loadType === 'group'){
+				this.loadGroup(this.props);
+			}
+			else if (params.loadType === 'exercise'){
+				this.loadExercise(this.props);
+			}		
 		}
 	}
 
@@ -77,7 +95,12 @@ export class Calc extends React.Component<Props> {
 		const { source, id, filename, index } = props.match.params;
 
 		this.props.loadGroup(source, id, filename, Number.parseInt(index, 10), '', '');
-		// TODO: display errors
+	}
+
+	private loadExercise(props: Props) {
+		const { source, id, filename, index } = props.match.params;
+
+		this.props.loadExercise(source, id, filename, Number.parseInt(index, 10), '');
 	}
 
 	componentWillReceiveProps(nextProps: Props): void {
@@ -93,21 +116,23 @@ export class Calc extends React.Component<Props> {
 
 	render() {
 		const { locale } = this.props;
-		const { current } = this.props.groups;
+		const currentGroup = this.props.groups.current;
+		const currentExercise = this.props.exercises.current;
 
-		if (current !== null) {
+		if (currentGroup !== null && (this.apiView == true || currentExercise !== null)) {
 			if (this.apiView == true) {
 				return (
 					<Api
-						group={current.group}
+						group={currentGroup.group}
 						locale={locale}
 						params={this.params}
 					/>
 				);
-			} else {
+			} else if (currentExercise !== null) {
 				return (
 					<Calculator
-						group={current.group}
+						group={currentGroup.group}
+						exercise={currentExercise.exercise}
 						locale={locale}
 						setDraft={this.props.setDraft}
 					/>
@@ -142,6 +167,7 @@ export const ConnectedCalc = connect((state: store.State) => {
 	
 	return {
 		groups: state.groups,
+		exercises: state.exercises,
 		locale: state.session.locale,
 	};
 }, (dispatch) => {
@@ -173,6 +199,27 @@ export const ConnectedCalc = connect((state: store.State) => {
 				type: 'GROUP_SET_DRAFT',
 				draft,
 			};
+			dispatch(action);
+		},
+
+		loadExercise: (
+			source: EXERCISES_LOAD_REQUEST['source'],
+			id: string,
+			filename: string,
+			index: number,
+			maintainer: string,
+		) => {
+			const action: EXERCISES_LOAD_REQUEST = {
+				type: 'EXERCISES_LOAD_REQUEST',
+				source,
+				id,
+				maintainer,
+				setCurrent: {
+					filename,
+					index,
+				},
+			};
+
 			dispatch(action);
 		},
 	};
