@@ -1,7 +1,9 @@
 exercise: Join
-description: "Perform a join between relation R and S"
-reference: "R⨝S"
+description: "Perform a join between relation Movies and Genres"
+reference: "Movies⨝Genres"
+dataset: gist/d37f667154aec34f5c4954723ae01db9/DBS1_MovieDB/0
 
 exercise: Union
 description: "Perform an union between relation S and T"
 reference: "S∪T"
+dataset: local/uibk/local/0

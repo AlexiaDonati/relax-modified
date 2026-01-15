@@ -18,8 +18,12 @@ type Props = {
 };
 
 export class MenuExercise extends React.Component<Props> {
+
+    gistLink: string;
+
 	constructor(props: Props) {
 		super(props);
+        this.gistLink = '';
 	}
 
     private getExercisesByHeadlineName = memoize((exercises: Props['exercises'], locale: string) => {
@@ -50,7 +54,9 @@ export class MenuExercise extends React.Component<Props> {
         return (
             <div className="container">
 				<div className="row">
-                    <h4>load an Exercise</h4>
+                    <div className="col-md-6">
+                        <h4>load an Exercise</h4>
+
                         <ul id="groups-selector-list">
                             {exercisesByHeadlineName.map((exercises: Exercise[], headline: any) => (
                                 <li key={`${headline}`}>
@@ -71,6 +77,14 @@ export class MenuExercise extends React.Component<Props> {
                                 </li>
                             )).valueSeq().toArray()}
                         </ul>
+                    </div>
+
+                    <div className="col-md-6 align-text-top align-top">
+                        <h4>Load exercise file stored in a gist</h4>
+
+                        <input type="text" className="form-control gist-load-input" placeholder="" size={32} onChange={(event) => { this.gistLink = '/relax/calc/exercise/gist/' + event.target.value; }} />
+                        <button onClick={() => {document.location.href = this.gistLink; this.props.exerciseLoaded(); }} type="button" className="fullWidthBtn btn btn-secondary gist-load-btn">Load</button>
+                    </div>
                 </div>
             </div>
         );

@@ -23,6 +23,7 @@ export function parseExercisesFromDefinition(text: string, groupInfo: ExerciseIn
         let name = '';
         let description = '';
         let reference = '';
+        let datasetPath = '';
 
         for (const line of lines) {
             const m = line.match(/^\s*([A-Za-z_]+)\s*:\s*(.*)$/);
@@ -45,6 +46,8 @@ export function parseExercisesFromDefinition(text: string, groupInfo: ExerciseIn
                 case 'reference':
                     reference = val;
                     break;
+                case 'dataset':
+                    datasetPath = val;
                 default:
                     break;
             }
@@ -52,8 +55,10 @@ export function parseExercisesFromDefinition(text: string, groupInfo: ExerciseIn
 
         const ex: Exercise = {
             name: name || '', 
-            definition: description || '',
+            description: description || '',
             reference: reference || '',
+            datasetPath: datasetPath || '',
+            
             exerciseInfo: {
                 ...groupInfo,
                 index: i,
@@ -67,26 +72,90 @@ export function parseExercisesFromDefinition(text: string, groupInfo: ExerciseIn
     return exercises;
 }
 
-export function loadExercisesFromSource(source: ExerciseSourceType = 'local', id: string, maintainer: string): Promise<Exercise[]> {
+export function loadExercisesFromSource(source: ExerciseSourceType, id: string, maintainer: string): Promise<Exercise[]> {
     return new Promise<Exercise[]>((resolve, reject) => {
-        try {
-            const data: string = LOCAL_DATA[id];
-            const info: ExerciseInfo = {
-                source,
-                id,
-                filename: 'local',
-                index: -1,
-                maintainer: maintainer,
-            };
-            const newExercises = parseExercisesFromDefinition(data, info, {});
-    
+
+        function gist_success(data: gist.Gist) {
+            const newExercises: Exercise[] = [];
+            
+            for (const filename in data.files) {
+                if (!data.files.hasOwnProperty(filename)) { continue; } 
+
+                const author = data.owner === null ? 'anonymous' : data.owner.login;
+                const authorUrl = data.owner === null ? undefined : data.owner.html_url;
+
+                const info: ExerciseInfo = {
+                    source,
+                    id: data.id,
+                    filename,
+                    index: -1,
+                    maintainer: maintainer,
+                };
+
+                const sourceInfo: SourceInfo = {
+                    author,
+                    authorUrl,
+                    lastModified: new Date(data.updated_at),
+                    url: data.url,
+                };
+
+                try {
+                    newExercises.push(...parseExercisesFromDefinition(data.files[filename].content, info, sourceInfo));
+                }
+                catch (e) {
+                    const msg = 'could not parse given group from gist with id "' + id + '": ' + e;
+                    console.error(msg, id, e, filename, data);
+                    reject(new Error(msg));
+                }
+            }
+
             resolve(newExercises);
         }
-        catch (e) {
-            let msg = 'cannot parse exercises file: ' + (e as Error).message;
-            msg += '<br>see log for more information';
-            console.error(msg, e);
-            reject(new Error(msg));
+
+        switch (source) {
+            case 'gist': {
+                jQuery.ajax({
+                    url: `https://api.github.com/gists/${id}`,
+                    dataType: 'json',
+                    success: gist_success,
+                    crossDomain: true,
+                    statusCode: {
+                        403: function (data: any) {
+                            reject(new Error(data.responseJSON.message));
+                        },
+                        404: function () {
+                            reject(new Error('gist ' + id + ' not found'));
+                        },
+                    },
+                    timeout: 10000,
+                    async: false,
+                });
+                break;
+            }
+            case 'local': {
+                try {
+                    const data: string = LOCAL_DATA[id];
+                    const info: ExerciseInfo = {
+                        source,
+                        id,
+                        filename: 'local',
+                        index: -1,
+                        maintainer: maintainer,
+                    };
+                    const newExercises = parseExercisesFromDefinition(data, info, {});
+            
+                    resolve(newExercises);
+                }
+                catch (e) {
+                    let msg = 'cannot parse exercises file: ' + (e as Error).message;
+                    msg += '<br>see log for more information';
+                    console.error(msg, e);
+                    reject(new Error(msg));
+                }
+                break;
+            }
+            default:
+                reject(new Error('unknown source ' + source));
         }
     });
 }

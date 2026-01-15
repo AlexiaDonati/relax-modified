@@ -132,12 +132,11 @@ export function loadGroupsFromSource(source: GroupSourceType, id: string, mainta
 
     function gist_success(data: gist.Gist) {
       const newGroups: Group[] = [];
+
       for (const filename in data.files) {
         if (!data.files.hasOwnProperty(filename)) {
           continue;
         }
-
-			//	console.log(data.files[filename].content)
 
         const author = data.owner === null ? 'anonymous' : data.owner.login;
         const authorUrl = data.owner === null ? undefined : data.owner.html_url;
@@ -159,7 +158,6 @@ export function loadGroupsFromSource(source: GroupSourceType, id: string, mainta
 
         try {
           newGroups.push(...parseGroupsFromDefinition(data.files[filename].content, info, sourceInfo));
-          resolve(newGroups);
         }
         catch (e) {
           // tslint:disable-next-line: prefer-template
@@ -168,6 +166,8 @@ export function loadGroupsFromSource(source: GroupSourceType, id: string, mainta
           reject(new Error(msg));
         }
       }
+
+      resolve(newGroups);
     }
 
     switch (source) {
@@ -178,8 +178,10 @@ export function loadGroupsFromSource(source: GroupSourceType, id: string, mainta
           success: gist_success,
           crossDomain: true,
           statusCode: {
+            403: function (data: any) {
+              reject(new Error(data.responseJSON.message));
+            },
             404: function () {
-              // tslint:disable-next-line: prefer-template
               reject(new Error('gist ' + id + ' not found'));
             },
           },

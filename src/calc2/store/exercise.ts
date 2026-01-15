@@ -2,6 +2,7 @@ import * as Immutable from 'immutable';
 import * as saga from 'redux-saga/effects';
 
 import * as store from 'calc2/store';
+import { GroupSourceType } from 'calc2/store/groups';
 import { loadExercisesFromSource } from 'calc2/utils/exerciseUtils';
 
 export type State = {
@@ -92,6 +93,16 @@ export function* rootSaga() {
                             index: 0,
                         };
                         yield saga.put(setCurrent);
+                        
+                        const dsPath = loadedExercises[0].datasetPath.split("/");
+                        const actionGroup: store.Action = {
+                            type: 'GROUP_SET_CURRENT',
+                            source: dsPath[0] as GroupSourceType,
+                            id: dsPath[1],
+                            filename: dsPath[2],
+                            index: parseInt(dsPath[3]),
+                        };
+                        yield saga.put(actionGroup);
                     }
                 }
             }
@@ -101,14 +112,44 @@ export function* rootSaga() {
             }
         }
     });
+
+    yield saga.takeEvery('EXERCISE_SET_CURRENT', function* (action: EXERCISE_SET_CURRENT) {
+        const state: store.State = yield saga.select();
+        const { source, id, filename, index } = action;
+
+        const exercise = state.exercises.exercises.find(e => (
+            e.exerciseInfo.source === source
+            && e.exerciseInfo.id === id
+            && e.exerciseInfo.filename === filename
+            && e.exerciseInfo.index === index
+        ));
+
+        if (!exercise) {
+            console.error('could not find exercise ', exercise);
+            return;
+        }
+
+        const datasetPath = exercise.datasetPath.split('/');
+
+        const actionGroup: store.Action = {
+            type: 'GROUP_SET_CURRENT',
+            source: datasetPath[0] as GroupSourceType,
+            id: datasetPath[1],
+            filename: datasetPath[2],
+            index: parseInt(datasetPath[3], 10),
+        };
+
+        yield saga.put(actionGroup);
+    });
 }
 
 export type ExerciseSourceType = 'http' | 'gist' | 'local';
 
 export type Exercise = {
     name: string,
-    definition: string,
+    description: string,
     reference: string,
+    datasetPath: string
 
     exerciseInfo: ExerciseInfo,
     sourceInfo: SourceInfo,
@@ -168,7 +209,12 @@ export function loadStaticExercises() {
             source: 'local',
             id: 'tp1',
             maintainer: 'misc',
-        },
+        },/*
+        {
+            source: 'gist',
+            id: '844030c2b2c2b91d1ed7e4e55c77fd4b',
+            maintainer: 'misc',
+        },*/
     ];
 
     let first: boolean = true;
@@ -182,7 +228,7 @@ export function loadStaticExercises() {
                 id,
                 maintainer,
 
-                setCurrent: first ? 'first' : undefined,
+                setCurrent: undefined, // do not set a current exercise when loading the page
             };
 
             first = false;
@@ -205,6 +251,7 @@ export function reduce(oldState: State | undefined, action: store.Action): State
     switch (action.type) {
         case 'EXERCISE_SET_CURRENT': {
             const { source, id, filename, index } = action;
+
             const exercise = oldState.exercises.find(e => (
                 e.exerciseInfo.source === source
                 && e.exerciseInfo.id === id
