@@ -8,6 +8,7 @@ import { Calculator } from 'calc2/components/calculator';
 import * as store from 'calc2/store';
 import { Group, GROUPS_LOAD_REQUEST, GROUP_SET_DRAFT } from 'calc2/store/groups';
 import { EXERCISES_LOAD_REQUEST } from '../store/exercise';
+import { SET_EXERCISE_MODE } from '../store/session';
 
 import * as React from 'react';
 import { connect } from 'react-redux';
@@ -23,10 +24,13 @@ type Props = RouteComponentProps<{
 	filename: string,
 	index: string,
 }> & {
+	session: store.State['session'],
 	groups: store.State['groups'],
 	exercises: store.State['exercises'],
-	locale: store.State['session']['locale'],
+	
 	params: any,
+
+	setGroupMode(setExerciseMode: boolean): void,
 	setDraft(draft: Group): void,
 	loadGroup(
 		source: GROUPS_LOAD_REQUEST['source'],
@@ -57,9 +61,8 @@ export class Calc extends React.Component<Props> {
 	}
 
 	componentDidMount() {
-		/*this.setState({
-			params: queryString.parse(this.props.location.search)
-		})*/
+		console.log('TEST 1');
+		
 		this.apiView = this.props.location.pathname.split("/")[2] == "api"
 		this.params = queryString.parse(this.props.location.search)
 
@@ -67,6 +70,14 @@ export class Calc extends React.Component<Props> {
 		if (this.apiView) {
 			this.loadGroup(this.props);
 		}
+
+		const { params } = this.props.match;
+		if(params.loadType === 'group'){
+			this.loadGroup(this.props);
+		}
+		else if (params.loadType === 'exercise'){
+			this.loadExercise(this.props);
+		}		
 	}
 
 	componentDidUpdate(prevProps: Props): void {
@@ -92,34 +103,29 @@ export class Calc extends React.Component<Props> {
 	}
 
 	private loadGroup(props: Props) {
-		const { source, id, filename, index } = props.match.params;
-
+		const { source, id, filename = '', index = '0' } = props.match.params;
+		console.log(props.match.params);
+		
 		this.props.loadGroup(source, id, filename, Number.parseInt(index, 10), '', '');
+		this.props.setGroupMode(false);
 	}
 
 	private loadExercise(props: Props) {
-		const { source, id, filename, index } = props.match.params;
+		const { source, id, filename = '', index = '0' } = props.match.params;
+		console.log(props.match.params);
 
 		this.props.loadExercise(source, id, filename, Number.parseInt(index, 10), '');
-	}
-
-	componentWillReceiveProps(nextProps: Props): void {
-		const { params } = this.props.match;
-		const { params: nextParams } = nextProps.match;
-		if (
-			nextParams.source !== params.source || nextParams.id !== params.id || nextParams.filename !== params.filename
-			|| nextParams.index !== params.index
-		) {
-			// change/load
-		}
+		this.props.setGroupMode(true);
 	}
 
 	render() {
-		const { locale } = this.props;
+		const locale = this.props.session.locale
+		const exerciseMode = this.props.session.exerciseMode
+
 		const currentGroup = this.props.groups.current;
 		const currentExercise = this.props.exercises.current;
 
-		if (currentGroup !== null && (this.apiView == true || currentExercise !== null)) {
+		if (currentGroup !== null) {
 			if (this.apiView == true) {
 				return (
 					<Api
@@ -128,20 +134,34 @@ export class Calc extends React.Component<Props> {
 						params={this.params}
 					/>
 				);
-			} else if (currentExercise !== null) {
+			} else if (exerciseMode == true && currentExercise !== null){
 				return (
 					<Calculator
 						group={currentGroup.group}
 						exercise={currentExercise.exercise}
+						
 						locale={locale}
+						exerciseMode={exerciseMode}
+
+						setDraft={this.props.setDraft}
+					/>
+				);
+			} else if (exerciseMode == false){
+				return (
+					<Calculator
+						group={currentGroup.group}
+						exercise={null}
+						
+						locale={locale}
+						exerciseMode={exerciseMode}
+
 						setDraft={this.props.setDraft}
 					/>
 				);
 			}
 		}
-		else {
-			return <div>loading ...</div>;
-		}
+		
+		return <div>loading ...</div>;
 	}
 }
 
@@ -149,7 +169,6 @@ export const ConnectedCalc = connect((state: store.State) => {
 
 	// save current dataset to local storage to be shown as 'recently used groups'
 	const lsGists = localStorage.getItem('groups');
-	
 	
 	if(state.groups.current && Object.keys(state.groups.current.group.sourceInfo).length > 0) {
 		if(!lsGists) {
@@ -164,12 +183,12 @@ export const ConnectedCalc = connect((state: store.State) => {
 		}
 	}
 	
-	
 	return {
+		session: state.session,
 		groups: state.groups,
 		exercises: state.exercises,
-		locale: state.session.locale,
 	};
+	
 }, (dispatch) => {
 	return {
 		loadGroup: (
@@ -191,9 +210,9 @@ export const ConnectedCalc = connect((state: store.State) => {
 					index,
 				},
 			};
-
 			dispatch(action);
 		},
+		
 		setDraft: (draft: Group) => {
 			const action: GROUP_SET_DRAFT = {
 				type: 'GROUP_SET_DRAFT',
@@ -219,7 +238,16 @@ export const ConnectedCalc = connect((state: store.State) => {
 					index,
 				},
 			};
+			dispatch(action);
+		},
 
+		setGroupMode: (
+			exerciseMode: boolean
+		) => {	
+			const action: SET_EXERCISE_MODE = {
+				type: 'SET_EXERCISE_MODE',
+				exerciseMode
+			};
 			dispatch(action);
 		},
 	};

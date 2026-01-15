@@ -40,7 +40,7 @@ function reduce(oldState: State | undefined, action: Action): State {
 
 	const state = {
 		version: oldState.version,
-		session: session.reduce(oldState.session, action), // TODO: session reducer
+		session: session.reduce(oldState.session, action),
 		groups: groups.reduce(oldState.groups, action),
 		exercises: exercise.reduce(oldState.exercises, action),
 	};

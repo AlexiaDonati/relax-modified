@@ -520,6 +520,7 @@ type Props = {
 	exampleRA?: string
 
 	exerciseReference?: string,
+	exerciseMode: boolean,
 };
 
 type State = {
@@ -979,16 +980,18 @@ export class EditorBase extends React.Component<Props, State> {
 			execSuccessful,
 			verifySuccessful,
 			isExecutionDisabled,
+
 			execResult,
-			execTime,
-			queryResult,
 			verifyResult,
 		} = this.state;
+
 		const {
 			toolbar,
 			disableHistory = false,
 			execButtonLabel,
+			exerciseMode,
 		} = this.props;
+
 		const { activeTab } = this.state;
 
 		return (
@@ -1037,27 +1040,29 @@ export class EditorBase extends React.Component<Props, State> {
 									)
 								}
 							</button>
-
-							<button
-								type="button"
-								disabled={isExecutionDisabled}
-								className={classnames('btn btn-secondary verify-button', {
-									'btn-success': verifySuccessful,
-									'disabled': isExecutionDisabled,
-								})}
-								onClick={() => {
-									if (!editor) {
-										console.warn(`editor not initialized yet`);
-										return;
-									}
-									this.verify();
-								}}
-							>
-								<span className="query">
-									<FontAwesomeIcon icon={faLightbulb as IconProp} /> 
-									<span>Verify Query</span>
-								</span>
-							</button>
+							
+							{exerciseMode ?
+								<button
+									type="button"
+									disabled={isExecutionDisabled}
+									className={classnames('btn btn-secondary verify-button', {
+										'btn-success': verifySuccessful,
+										'disabled': isExecutionDisabled,
+									})}
+									onClick={() => {
+										if (!editor) {
+											console.warn(`editor not initialized yet`);
+											return;
+										}
+										this.verify();
+									}}
+								>
+									<span className="query">
+										<FontAwesomeIcon icon={faLightbulb as IconProp} /> 
+										<span>Verify Query</span>
+									</span>
+								</button>
+							: ''}
 						</div>
 
 						<div style={{ float: 'right' }}>
@@ -1129,24 +1134,28 @@ export class EditorBase extends React.Component<Props, State> {
 									<span className="showOnSM">Exec</span>
 								</NavLink>
 							</NavItem>
-							<NavItem>
-								<NavLink
-									className={classnames({ active: activeTab === 'verify' })}
-									onClick={() => { this.setState({ activeTab: 'verify' }); }}
-								>
-									<span className="hideOnSM">Verification</span>
-									<span className="showOnSM">Verify</span>
-								</NavLink>
-							</NavItem>
+							{exerciseMode ? 
+								<NavItem>
+									<NavLink
+										className={classnames({ active: activeTab === 'verify' })}
+										onClick={() => { this.setState({ activeTab: 'verify' }); }}
+									>
+										<span className="hideOnSM">Verification</span>
+										<span className="showOnSM">Verify</span>
+									</NavLink>
+								</NavItem>
+							: ''}
 						</Nav>
 
 						<TabContent activeTab={this.state.activeTab} className="tab-content-border">
 							<TabPane tabId="exec">
 								{execResult}
 							</TabPane>
-							<TabPane tabId="verify">
-								{verifyResult}
-							</TabPane>
+							{exerciseMode ? 
+								<TabPane tabId="verify">
+									{verifyResult}
+								</TabPane>
+							: ''}
 						</TabContent>
 					</div>
 					
@@ -1698,6 +1707,10 @@ export class EditorBase extends React.Component<Props, State> {
 	}
 
 	verify() {	
+		if(!this.props.exerciseMode){
+			throw new Error('tried to verify exercise while not in exercise mode');
+		}
+
 		this.setState({ activeTab: 'verify' });
 
 		const { editor } = this.state;

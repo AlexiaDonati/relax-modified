@@ -8,10 +8,12 @@ import * as store from 'calc2/store';
 
 export type Action = (
   | SET_LOCALE
+  | SET_EXERCISE_MODE
 );
 
 export type State = {
   locale: 'en' | 'de' | 'es' | string,
+  exerciseMode : boolean
 };
 
 
@@ -20,12 +22,16 @@ export type SET_LOCALE = {
   locale: string,
 };
 
-
+export type SET_EXERCISE_MODE = {
+  type: 'SET_EXERCISE_MODE',
+  exerciseMode: boolean,
+};
 
 export function reduce(oldState: State | undefined, action: store.Action): State {
   if (!oldState) {
     oldState = {
       locale: 'en',
+      exerciseMode: false
     };
   }
 
@@ -38,8 +44,17 @@ export function reduce(oldState: State | undefined, action: store.Action): State
 
       return {
         ...oldState,
-        locale,
+        locale: locale,
       };
+    }
+
+    case 'SET_EXERCISE_MODE': {
+      let { exerciseMode } = action;
+
+      return {
+        ...oldState,
+        exerciseMode: exerciseMode,
+      }
     }
 
     default: {

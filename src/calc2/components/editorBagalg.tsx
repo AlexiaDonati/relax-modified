@@ -28,7 +28,8 @@ export const KEYWORDS_RELALG = [
 
 type Props = {
 	group: Group,
-	exercise: Exercise,
+	exercise: Exercise | null,
+	exerciseMode: boolean,
 
 	relInsertModalToggle: Function,
 };
@@ -65,7 +66,9 @@ export class EditorBagalg extends React.Component<Props, State> {
 
 		return (
 			<EditorBase
-				exerciseReference = {this.props.exercise.reference}
+				exerciseMode = {this.props.exerciseMode}
+				exerciseReference = {this.props.exercise ? this.props.exercise.reference : ''}
+
 				exampleBags={group.exampleBags}
 				exampleRA={group.exampleRA}
 				exampleSql={group.exampleSQL}

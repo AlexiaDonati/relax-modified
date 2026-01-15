@@ -61,6 +61,9 @@ export class EditorGroup extends React.Component<Props> {
 
 		return (
 			<EditorBase
+				exerciseMode = {false}
+				exerciseReference = ''
+
 				textChange={(cm: CodeMirror.Editor) => { } }
 				ref={ref => {
 					if (ref) {

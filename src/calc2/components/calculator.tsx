@@ -31,8 +31,11 @@ require('./calculator.scss');
 
 type Props = {
 	group: Group,
-	exercise: Exercise,
+	exercise: Exercise | null,
+
 	locale: store.State['session']['locale'],
+	exerciseMode: store.State['session']['exerciseMode'],
+
 	setDraft(draft: Group): void,
 };
 
@@ -135,7 +138,7 @@ example,  42
 	}
 
 	render() {
-		const { group, exercise, locale } = this.props;
+		const { group, exercise, locale, exerciseMode } = this.props;
 		const { activeTab } = this.state;
 
 		return (
@@ -239,6 +242,8 @@ example,  42
 								<EditorRelalg
 									group={group}
 									exercise={exercise}
+									exerciseMode={exerciseMode}
+
 									ref={this.refEditorRelalg}
 									relInsertModalToggle={this.insertRelationToggle}
 								/>
@@ -246,6 +251,9 @@ example,  42
 							<TabPane tabId="bagalg">
 								<EditorBagalg
 									group={group}
+									exercise={exercise}
+									exerciseMode={exerciseMode}
+
 									ref={this.refEditorBagalg}
 									relInsertModalToggle={this.insertRelationToggle}
 								/>
@@ -278,15 +286,16 @@ example,  42
 							<span>Select Exercise</span>
 							<span className="caret" style={{ display: 'block', position: 'absolute', top: '50%', right: '10px' }}></span>
 						</button>
-
-						<div>
+						{exerciseMode && exercise !== null ?
 							<div>
-								<span> Exercise definition: </span>	{exercise.definition}
+								<div>
+									<span> Exercise description: </span> {exercise.description}
+								</div>
+								<div>
+									<span> Reference solution: </span> {exercise.reference}
+								</div>
 							</div>
-							<div>
-								<span> Reference solution: </span> {exercise.reference}
-							</div>
-						</div>
+						: ''}
 					</div>
 				</div>
 
