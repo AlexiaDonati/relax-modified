@@ -52,6 +52,9 @@ export class EditorSql extends React.Component<Props> {
 		
 		return (
 			<EditorBase
+				exerciseMode = {false}
+				exerciseReference = ''
+
 				textChange={(cm: CodeMirror.Editor) => { } }
 				exampleSql={group.exampleSQL}
 				exampleBags={group.exampleBags}

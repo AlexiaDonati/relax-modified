@@ -61,28 +61,31 @@ export class Calc extends React.Component<Props> {
 	}
 
 	componentDidMount() {
-		console.log('TEST 1');
-		
 		this.apiView = this.props.location.pathname.split("/")[2] == "api"
 		this.params = queryString.parse(this.props.location.search)
+
+		const { params } = this.props.match;
 
 		// It's necessary to load remote group synchronouly
 		if (this.apiView) {
 			this.loadGroup(this.props);
-		}
+		}	
+		else if (this.init === false) { // change/load
+			this.init = true;
 
-		const { params } = this.props.match;
-		if(params.loadType === 'group'){
-			this.loadGroup(this.props);
+			if(params.loadType === 'group'){
+				this.loadGroup(this.props);
+			}
+			else if (params.loadType === 'exercise'){
+				this.loadExercise(this.props);
+			}		
 		}
-		else if (params.loadType === 'exercise'){
-			this.loadExercise(this.props);
-		}		
 	}
 
 	componentDidUpdate(prevProps: Props): void {
 		const { params } = this.props.match;
 		const { params: prevParams } = prevProps.match;
+
 		if (
 			this.init === false
 			|| params.source !== prevParams.source
@@ -104,7 +107,6 @@ export class Calc extends React.Component<Props> {
 
 	private loadGroup(props: Props) {
 		const { source, id, filename = '', index = '0' } = props.match.params;
-		console.log(props.match.params);
 		
 		this.props.loadGroup(source, id, filename, Number.parseInt(index, 10), '', '');
 		this.props.setGroupMode(false);
@@ -112,7 +114,6 @@ export class Calc extends React.Component<Props> {
 
 	private loadExercise(props: Props) {
 		const { source, id, filename = '', index = '0' } = props.match.params;
-		console.log(props.match.params);
 
 		this.props.loadExercise(source, id, filename, Number.parseInt(index, 10), '');
 		this.props.setGroupMode(true);
