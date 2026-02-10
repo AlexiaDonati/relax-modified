@@ -47,10 +47,10 @@ export class NavigationMobile extends React.Component<Props, State> {
                         <FontAwesomeIcon icon={faBars  as IconProp} />
                     </DropdownToggle>
                     <DropdownMenu>
-                        <DropdownItem href="/relax/calc"><FontAwesomeIcon icon={faCalculator as IconProp} /> <T id="calc.navigation.calc" /></DropdownItem>
-                        <DropdownItem href="/relax/help"><FontAwesomeIcon icon={faComment as IconProp} /> <T id="calc.navigation.help" /></DropdownItem>
-                        <DropdownItem href="/relax/imprint"><FontAwesomeIcon icon={faAddressCard as IconProp} /> <T id="calc.navigation.imprint" /></DropdownItem>
-                        <DropdownItem href="https://github.com/dbis-uibk/relax/issues"><FontAwesomeIcon icon={faQuestionCircle  as IconProp} /> <T id="calc.navigation.feedback" /></DropdownItem>
+                        <DropdownItem href="/calc"><FontAwesomeIcon icon={faCalculator as IconProp} /> <T id="calc.navigation.calc" /></DropdownItem>
+                        <DropdownItem href="/help"><FontAwesomeIcon icon={faComment as IconProp} /> <T id="calc.navigation.help" /></DropdownItem>
+                        <DropdownItem href="/imprint"><FontAwesomeIcon icon={faAddressCard as IconProp} /> <T id="calc.navigation.imprint" /></DropdownItem>
+                        <DropdownItem href="https://github.com/AlexiaDonati/relax-modified/issues"><FontAwesomeIcon icon={faQuestionCircle  as IconProp} /> <T id="calc.navigation.feedback" /></DropdownItem>
                         <DropdownItem divider />
                         <DropdownItem onClick={() => this.changeLocale('en')}>en</DropdownItem>
                         <DropdownItem onClick={() => this.changeLocale('de')}>de</DropdownItem>
