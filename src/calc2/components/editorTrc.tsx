@@ -48,7 +48,7 @@ export class EditorTrc extends React.Component<Props, State> {
 		return (
 			<EditorBase
 				exerciseMode = {false}
-				exerciseReference = ''
+				exerciseReference = {undefined}
 
 				textChange={(cm: CodeMirror.Editor) => { }}
 				exampleSql={group.exampleSQL}

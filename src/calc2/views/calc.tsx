@@ -7,7 +7,7 @@
 import { Calculator } from 'calc2/components/calculator';
 import * as store from 'calc2/store';
 import { Group, GROUPS_LOAD_REQUEST, GROUP_SET_DRAFT } from 'calc2/store/groups';
-import { EXERCISES_LOAD_REQUEST } from '../store/exercise';
+import { Exercise, EXERCISES_LOAD_REQUEST } from '../store/exercise';
 import { SET_EXERCISE_MODE } from '../store/session';
 
 import * as React from 'react';
@@ -151,7 +151,7 @@ export class Calc extends React.Component<Props> {
 				return (
 					<Calculator
 						group={currentGroup.group}
-						exercise={null}
+						exercise={undefined}
 						
 						locale={locale}
 						exerciseMode={exerciseMode}

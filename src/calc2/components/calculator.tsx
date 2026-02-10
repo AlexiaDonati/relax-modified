@@ -31,7 +31,7 @@ require('./calculator.scss');
 
 type Props = {
 	group: Group,
-	exercise: Exercise | null,
+	exercise: Exercise | undefined,
 
 	locale: store.State['session']['locale'],
 	exerciseMode: store.State['session']['exerciseMode'],
@@ -286,7 +286,7 @@ example,  42
 							<span>Select Exercise</span>
 							<span className="caret" style={{ display: 'block', position: 'absolute', top: '50%', right: '10px' }}></span>
 						</button>
-						{exerciseMode && exercise !== null ?
+						{exerciseMode && exercise !== undefined ?
 							<div>
 								<div>
 									<span> Exercise description: </span> {exercise.description}
