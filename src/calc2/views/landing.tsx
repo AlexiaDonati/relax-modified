@@ -43,7 +43,7 @@ export class Landing extends React.Component {
 								<p>calculates any relational algebra statement like <code><span>( &sigma; <sub>a &gt; 42</sub> ( A ) ) <span className="math">⋈</span> ( &pi; <sub>a,b</sub> ( B ) )</span></code> on a set of relations.</p>
 							</div>
 							<div className="col-md-12 ct">
-								<Link className="btn btn-primary btn-lg getStartedBtn" role="button" to="/calc">Get Started</Link>
+								<Link className="btn btn-primary btn-lg getStartedBtn" role="button" to="/relax-modified/calc">Get Started</Link>
 							</div>
 						</div>
 
@@ -525,7 +525,7 @@ export class Landing extends React.Component {
 							<li>0.18
 								<ul>
 									<li>
-										added support for the <a href="/help#relalg-valueexpr">LIKE-operator</a> for SQL and
+										added support for the <a href="/relax-modified/help#relalg-valueexpr">LIKE-operator</a> for SQL and
 										relational algebra
 										<br />e.g. <code>pi 'abc' like 'a%'-&gt;x R</code>
 									</li>
@@ -549,30 +549,30 @@ allows easy translation of the main calculator into other languages.
 							<li>0.16
 								<ul>
 									<li>disallow relational algebra keywords as column-/relation-names</li>
-									<li>fixed precedence for <a href="/help#relalg-valueexpr">CASE-WHEN-expressions</a></li>
-									<li>added support for the SQL-92 <a href="/help#relalg-valueexpr"><code>||</code>-concat
+									<li>fixed precedence for <a href="/relax-modified/help#relalg-valueexpr">CASE-WHEN-expressions</a></li>
+									<li>added support for the SQL-92 <a href="/relax-modified/help#relalg-valueexpr"><code>||</code>-concat
 										operator</a></li>
 									<li>added <code>except</code> as alternative syntax for the <a
-										href="/help#relalg-operations-subtraction">relational algebra set-difference
+										href="/relax-modified/help#relalg-operations-subtraction">relational algebra set-difference
 										operator</a></li>
 									<li>
 										fixed bug where <code>A=R join S A</code> was interpreted as
 										<code>A=(R join S A)</code> instead of <code>A=(R join S) A</code>.
-										<br />see <a href="/help#relalg-operations-innerjoin">help page</a> for more information
+										<br />see <a href="/relax-modified/help#relalg-operations-innerjoin">help page</a> for more information
 									</li>
 								</ul>
 							</li>
 							<li>0.15
 								<ul>
 									<li>
-										added support for <a href="/help#relalg-valueexpr">hour(), minute() and second()</a>
+										added support for <a href="/relax-modified/help#relalg-valueexpr">hour(), minute() and second()</a>
 									</li>
 									<li>
-										added support for <a href="/help#relalg-valueexpr">now()</a>
+										added support for <a href="/relax-modified/help#relalg-valueexpr">now()</a>
 										<br />e.g. <code>pi hour(now())-&gt;x, minute(now())-&gt;y, second(now())-&gt;z ( R )</code>
 									</li>
 									<li>
-										added support for <a href="/help#relalg-valueexpr">n-ary concat</a>
+										added support for <a href="/relax-modified/help#relalg-valueexpr">n-ary concat</a>
 										<br />e.g. <code>pi concat(b, '_', c)-&gt;x R</code>
 									</li>
 									<li>added support for WITH-clauses for SQL</li>
@@ -589,12 +589,12 @@ allows easy translation of the main calculator into other languages.
 								<ul>
 									<li>updated to CodeMirror version 5.1 with "experimental mobile support"</li>
 									<li>
-										added support for <a href="/help#relalg-valueexpr">COALESCE()</a>
+										added support for <a href="/relax-modified/help#relalg-valueexpr">COALESCE()</a>
 										<br />e.g. <code>pi coalesce(a, b, 1)-&gt;x R</code>, <code>select coalesce(a, b, 1) as x from
 										R</code>
 									</li>
 									<li>
-										added support for <a href="/help#relalg-valueexpr">CASE WHEN</a>
+										added support for <a href="/relax-modified/help#relalg-valueexpr">CASE WHEN</a>
 										<br />e.g. <code>select case when a &gt; 3 then a+1 else a end as x from R</code>
 									</li>
 									<li>added support for complex union/intersect/except statements for SQL
@@ -616,7 +616,7 @@ allows easy translation of the main calculator into other languages.
 									<li>added a tour to explain the main features of the tool to new users (using <a
 										href="http://bootstraptour.com/" target="_blank">Bootstrap Tour</a>)
 									</li>
-									<li>added <a href="/help#sql-reference">reference for SQL in the help section</a></li>
+									<li>added <a href="/relax-modified/help#sql-reference">reference for SQL in the help section</a></li>
 									<li>added support for USING clause for joins for SQL</li>
 									<li>added support FETCH FIRST syntax (SQL:2008) for SQL
 										<br />e.g. <code>select * from R offset 2 rows fetch first 10 rows only</code>
@@ -627,7 +627,7 @@ allows easy translation of the main calculator into other languages.
 							</li>
 							<li>0.10
 								<ul>
-									<li>added support for <a href="/help#relalg-valueexpr">arithmetic expressions and
+									<li>added support for <a href="/relax-modified/help#relalg-valueexpr">arithmetic expressions and
 										functions</a> for SQL
 										<br />e.g. <code>select distinct a+2 as x from R where length(b) &gt; 2</code>
 									</li>
@@ -638,15 +638,15 @@ allows easy translation of the main calculator into other languages.
 							</li>
 							<li>0.9
 								<ul>
-									<li>added support for arithmetic operators and functions in <a href="/help#relalg-valueexpr">(e.g
+									<li>added support for arithmetic operators and functions in <a href="/relax-modified/help#relalg-valueexpr">(e.g
 										boolean) expressions</a> for relational algebra
 									</li>
-									<li>projection supports <a href="/help#relalg-operations-projection">expressions</a></li>
-									<li>removed magic <a href="/help#relalg-operations-projection">ROWNUM</a> column; <a
-										href="/help#relalg-valueexpr">ROWNUM()</a> is now a function
+									<li>projection supports <a href="/relax-modified/help#relalg-operations-projection">expressions</a></li>
+									<li>removed magic <a href="/relax-modified/help#relalg-operations-projection">ROWNUM</a> column; <a
+										href="/relax-modified/help#relalg-valueexpr">ROWNUM()</a> is now a function
 									</li>
-									<li>tutorials for <a href="/help#tutorial-user">users</a> and <a
-										href="/help#tutorial-maintainer">maintainers</a></li>
+									<li>tutorials for <a href="/relax-modified/help#tutorial-user">users</a> and <a
+										href="/relax-modified/help#tutorial-maintainer">maintainers</a></li>
 									<li>new braces handling in formula generation (braces are only placed if necessary)</li>
 									<li>bugfix: rename not existent column was silently ignored</li>
 									<li>syntax of dates has changed <code>1970-01-01</code> could not be used any more because it is

@@ -46,22 +46,23 @@ export class Main extends React.Component<Props, State> {
 		const { store } = this.props;
 
 		return (
-			<Router basename="/relax-modified">
+			<Router>
 				<Provider store={store}>
 					<I18NProvider>
 						<Switch>
-							<Redirect exact from="/" to={`/landing`} />
-							<Redirect exact from="/relax" to={`/landing`} />
-							<Route path="/landing" component={Landing} />
-							<Route path="/help" component={Help} />
-							<Route path="/imprint" component={Imprint} />
+							<Redirect exact from="/" to={`/relax-modified/landing`} />
+							<Redirect exact from="/relax" to={`/relax-modified/landing`} />
+							<Redirect exact from="/relax-modified" to={`/relax-modified/landing`} />
+							<Route path="/relax-modified/landing" component={Landing} />
+							<Route path="/relax-modified/help" component={Help} />
+							<Route path="/relax-modified/imprint" component={Imprint} />
 
-							<Redirect from="/calc" to="/calc/group/local/uibk/local/0" exact strict />
-							<Route path="/calc/:loadType/:source/:id/:filename/:index" component={ConnectedCalc} />
-							<Route path="/calc/:loadType/:source/:id" component={ConnectedCalc} />
+							<Redirect from="/relax-modified/calc" to="/relax-modified/calc/group/local/uibk/local/0" exact strict />
+							<Route path="/relax-modified/calc/:loadType/:source/:id/:filename/:index" component={ConnectedCalc} />
+							<Route path="/relax-modified/calc/:loadType/:source/:id" component={ConnectedCalc} />
 
-							<Route path="/api/:loadType/:source/:id/:filename/:index" component={ConnectedCalc} />
-							<Route path="/api/:loadType/:source/:id" component={ConnectedCalc} />
+							<Route path="/relax-modified/api/:loadType/:source/:id/:filename/:index" component={ConnectedCalc} />
+							<Route path="/relax-modified/api/:loadType/:source/:id" component={ConnectedCalc} />
 							<Route render={match => (
 								<div className="view-min"><h1>404</h1>
 									<p>This route doesn't exist</p>

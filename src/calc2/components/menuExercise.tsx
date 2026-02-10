@@ -63,7 +63,7 @@ export class MenuExercise extends React.Component<Props> {
                                     {!headline ? <T id="calc.maintainer-groups.misc" /> : headline}
                                     <ul>
                                         {exercises.map((exercise: Exercise, i: any) => {
-                                            const path = `/calc/exercise/${exercise.exerciseInfo.source}/${exercise.exerciseInfo.id}/${exercise.exerciseInfo.filename}/${exercise.exerciseInfo.index}`;
+                                            const path = `/relax-modified/calc/exercise/${exercise.exerciseInfo.source}/${exercise.exerciseInfo.id}/${exercise.exerciseInfo.filename}/${exercise.exerciseInfo.index}`;
 
                                             return (
                                                 <li key={path} className={classNames({
@@ -82,7 +82,7 @@ export class MenuExercise extends React.Component<Props> {
                     <div className="col-md-6 align-text-top align-top">
                         <h4>Load exercise file stored in a gist</h4>
 
-                        <input type="text" className="form-control gist-load-input" placeholder="" size={32} onChange={(event) => { this.gistLink = '/calc/exercise/gist/' + event.target.value; }} />
+                        <input type="text" className="form-control gist-load-input" placeholder="" size={32} onChange={(event) => { this.gistLink = '/relax-modified/calc/exercise/gist/' + event.target.value; }} />
                         <button onClick={() => {document.location.href = this.gistLink; this.props.exerciseLoaded(); }} type="button" className="fullWidthBtn btn btn-secondary gist-load-btn">Load</button>
                     </div>
                 </div>

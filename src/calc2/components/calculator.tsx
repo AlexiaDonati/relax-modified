@@ -179,8 +179,8 @@ example,  42
 									<FontAwesomeIcon icon={faBars as IconProp} />
 								</DropdownToggle>
 								<DropdownMenu>
-									<DropdownItem href="/calc"><FontAwesomeIcon icon={faCalculator as IconProp} /> <T id="calc.navigation.calc" /></DropdownItem>
-									<DropdownItem href="/help"><FontAwesomeIcon icon={faComment as IconProp } /> <T id="calc.navigation.help" /></DropdownItem>
+									<DropdownItem href="/relax-modified/calc"><FontAwesomeIcon icon={faCalculator as IconProp} /> <T id="calc.navigation.calc" /></DropdownItem>
+									<DropdownItem href="/relax-modified/help"><FontAwesomeIcon icon={faComment as IconProp } /> <T id="calc.navigation.help" /></DropdownItem>
 									<DropdownItem href="https://github.com/AlexiaDonati/relax-modified/issues"><FontAwesomeIcon icon={faQuestionCircle as IconProp} /> <T id="calc.navigation.feedback" /></DropdownItem>
 									<DropdownItem onClick={this.toggleDatasetModal}><FontAwesomeIcon icon={faDatabase as IconProp} /> <T id="calc.menu.datasets" /></DropdownItem>
 									<DropdownItem divider />
