@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 import * as saga from 'redux-saga/effects';
 
 import * as store from 'calc2/store';
-import { GroupSourceType } from 'calc2/store/groups';
+import { Group, GroupSourceType } from 'calc2/store/groups';
 import { loadExercisesFromSource } from 'calc2/utils/exerciseUtils';
 
 export type State = {
@@ -52,6 +52,35 @@ export function* rootSaga() {
                 }
 
                 const loadedExercises: Exercise[] = yield saga.call(loadExercisesFromSource, source, id, maintainer);
+
+                for (const exercise of loadedExercises) { // set the groups element of the verificationGroups element of each exercise
+                    const { source, id } = exercise.verificationGroups;
+                    if(source === '' as GroupSourceType || id === ''){
+                        continue;
+                    }
+
+                    const actionGroup: store.Action = {
+                        type: 'GROUPS_LOAD_REQUEST',
+
+                        source: source,
+                        id: id,
+
+                        setCurrent: undefined,
+
+                        maintainer: exercise.exerciseInfo.maintainer,
+                        maintainerGroup: 'misc',
+                    };
+                    yield saga.put(actionGroup);
+
+                    yield saga.take('GROUPS_LOAD_SUCCESS');
+                    const updatedState: store.State = yield saga.select();
+
+                    const findGroups = updatedState.groups.groups.filter(e => (
+                        e.groupInfo.source === source
+                        && e.groupInfo.id === id
+                    ));
+                    exercise.verificationGroups.groups = Array.from(findGroups.values());
+                }
 
                 const success: EXERCISES_LOAD_SUCCESS = {
                     type: 'EXERCISES_LOAD_SUCCESS',
@@ -151,6 +180,8 @@ export type Exercise = {
     reference: string,
     datasetPath: string
 
+    verificationGroups : VerficationGroups
+
     exerciseInfo: ExerciseInfo,
     sourceInfo: SourceInfo,
 };
@@ -168,6 +199,13 @@ export type SourceInfo = {
     authorUrl?: string,
     url?: string,
     lastModified?: Date,
+};
+
+export type VerficationGroups = {
+    source: string,
+    id: string,
+    
+    groups: Group[] | undefined,
 };
 
 // region actions
@@ -209,15 +247,16 @@ export function loadStaticExercises() {
             source: 'local',
             id: 'tp1',
             maintainer: 'misc',
-        },/*
+        },
+        /*
         {
             source: 'gist',
             id: '844030c2b2c2b91d1ed7e4e55c77fd4b',
             maintainer: 'misc',
-        },*/
+        },
+        */
+        // Add source information of the exercises that must be loaded automatically here !
     ];
-
-    let first: boolean = true;
 
     const actions: EXERCISES_LOAD_REQUEST[] = (
         exercises.map(({ source, id, maintainer}) => {
@@ -230,8 +269,6 @@ export function loadStaticExercises() {
 
                 setCurrent: undefined, // do not set a current exercise when loading the page
             };
-
-            first = false;
 
             return action;
         })

@@ -1,5 +1,6 @@
 
-import {Exercise, ExerciseInfo, SourceInfo, ExerciseSourceType} from 'calc2/store/exercise';
+import { Exercise, ExerciseInfo, SourceInfo, ExerciseSourceType, VerficationGroups } from 'calc2/store/exercise';
+import { Group, GroupSourceType } from 'calc2/store/groups';
 
 const ld_tp1: any = require('../data/tp1.txt');
 const LOCAL_DATA: { [id: string]: string } = {
@@ -24,6 +25,7 @@ export function parseExercisesFromDefinition(text: string, groupInfo: ExerciseIn
         let description = '';
         let reference = '';
         let datasetPath = '';
+        let testsPath = ['', ''];
 
         for (const line of lines) {
             const m = line.match(/^\s*([A-Za-z_]+)\s*:\s*(.*)$/);
@@ -48,10 +50,21 @@ export function parseExercisesFromDefinition(text: string, groupInfo: ExerciseIn
                     break;
                 case 'dataset':
                     datasetPath = val;
+                    break;
+                case 'tests':
+                    testsPath = val.split("/");
+                    break;
                 default:
                     break;
             }
         }
+        
+        const verificationGroups: VerficationGroups = {
+            source: testsPath[0],
+            id: testsPath[1],
+
+            groups: undefined,
+        };
 
         const ex: Exercise = {
             name: name || '', 
@@ -59,6 +72,8 @@ export function parseExercisesFromDefinition(text: string, groupInfo: ExerciseIn
             reference: reference || '',
             datasetPath: datasetPath || '',
             
+            verificationGroups: verificationGroups,
+
             exerciseInfo: {
                 ...groupInfo,
                 index: i,

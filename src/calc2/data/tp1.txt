@@ -7,3 +7,4 @@ exercise: Union
 description: "Perform an union between relation S and T"
 reference: "S∪T"
 dataset: local/uibk/local/0
+tests: gist/aec168d2cff924f6a6f4c9c1b61ad35d

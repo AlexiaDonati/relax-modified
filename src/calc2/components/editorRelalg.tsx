@@ -28,11 +28,12 @@ export const KEYWORDS_RELALG = [
 
 type Props = {
 	group: Group,
-	exercise: Exercise | null,
+	exercise: Exercise | undefined,
 	exerciseMode: boolean,
 
 	relInsertModalToggle: Function,
 };
+
 type State = {
 	autoreplaceOperatorsMode: AutoreplaceOperatorsMode,
 };
@@ -51,14 +52,12 @@ export class EditorRelalg extends React.Component<Props, State> {
 		this.replaceText = this.replaceText.bind(this);
 	}
 
-	
-	
-	
+	// region Render
 
 	render() {
 		const { group } = this.props;
 		const { autoreplaceOperatorsMode } = this.state;
-		// TODO: move to state
+
 		const relations: { [name: string]: Relation } = {};
 		group.tables.forEach(table => {
 			relations[table.tableName] = table.relation;
@@ -67,18 +66,21 @@ export class EditorRelalg extends React.Component<Props, State> {
 		return (
 			<EditorBase
 				exerciseMode = {this.props.exerciseMode}
-				exerciseReference = {this.props.exercise ? this.props.exercise.reference : ''}
+				exerciseReference = {this.props.exercise}
 				
 				exampleRA={group.exampleRA}
 				exampleBags={group.exampleBags}
 				exampleSql={group.exampleSQL}
+
 				textChange={(cm: CodeMirror.Editor) => { } }
 				ref={ref => {
 					if (ref) {
 						this.editorBase = ref;
 					}
 				}}
+
 				mode="relalg"
+
 				execFunction={(self: EditorBase, text: string, offset) => {
 					const ast = parseRelalg(text, Object.keys(relations));
 					replaceVariables(ast, relations);
@@ -91,7 +93,6 @@ export class EditorRelalg extends React.Component<Props, State> {
 							throw new Error(t('calc.messages.error-query-missing'));
 						}
 					}
-
 
 					const root = relalgFromRelalgAstRoot(ast, relations);
 					root.check();
@@ -116,6 +117,64 @@ export class EditorRelalg extends React.Component<Props, State> {
 						),
 					};
 				}}
+				
+				execTestsFunction={(self: EditorBase, text: string, offset: any, exerciseGroup: boolean, exerciseGroupIndex: number) => {
+					/*if randomData {
+						// TODO: Alexia add random variation of the data for the reference group schema
+					}*/
+
+					let testRelations: { [name: string]: Relation } = {};
+
+					if(exerciseGroup && this.props.exercise){
+						let groups = this.props.exercise.verificationGroups.groups;
+
+						if(groups){
+							if(exerciseGroupIndex < groups.length){
+								let testGroup = groups[exerciseGroupIndex];
+
+								testGroup.tables.forEach(table => {
+									testRelations[table.tableName] = table.relation;
+								});
+							}
+						}
+					}
+
+					// TODO: move share code to another function
+					const ast = parseRelalg(text, Object.keys(testRelations));
+					replaceVariables(ast, testRelations);
+
+					if (ast.child === null) {
+						if (ast.assignments.length > 0) {
+							throw new Error(t('calc.messages.error-query-missing-assignments-found'));
+						}
+						else {
+							throw new Error(t('calc.messages.error-query-missing'));
+						}
+					}
+
+					const root = relalgFromRelalgAstRoot(ast, testRelations);
+					root.check();
+
+
+					self.historyAddEntry(text);
+
+					if (self.props.enableInlineRelationEditor) {
+						self.addInlineRelationMarkers(ast);
+					}
+
+					return {
+						result: (
+							<Result
+								editorRef={this.editorBase!}
+								root={root}
+								numTreeLabelColors={NUM_TREE_LABEL_COLORS}
+								execTime={self.state.execTime == null ? 0 : self.state.execTime}
+								doEliminateDuplicates={true}
+							/>
+						),
+					};
+				}}
+				
 				tab="relalg"
 				linterFunction={(self: EditorBase, editor: CodeMirror.Editor, text: string) => {
 					const hints = [];
@@ -476,6 +535,8 @@ export class EditorRelalg extends React.Component<Props, State> {
 			/>
 		);
 	}
+
+	// region Replace
 
 	private replaceText(item: Item, overwrite?: string) {
 		if (this.editorBase) {
