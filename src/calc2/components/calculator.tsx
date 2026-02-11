@@ -291,9 +291,6 @@ example,  42
 								<div>
 									<span> Exercise description: </span> {exercise.description}
 								</div>
-								<div>
-									<span> Reference solution: </span> {exercise.reference}
-								</div>
 							</div>
 						: ''}
 					</div>
