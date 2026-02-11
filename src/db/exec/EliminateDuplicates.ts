@@ -10,11 +10,9 @@ import { Schema } from './Schema';
 import { Table } from './Table';
 
 /**
- * This is the Union operation
- * The two child expression must have a union compatible schema.
- * The schema of the left child is used as the output schema.
- *
- * Union is done by concatenating the two results (left||right)
+ * This is the EliminateDuplicates operation
+ * 
+ * EliminateDuplicates is done by removing duplicate rows from the result of the child node
  */
 export class EliminateDuplicates extends RANodeUnary {
 	private _schema: Schema | null = null;
@@ -50,5 +48,14 @@ export class EliminateDuplicates extends RANodeUnary {
 
 		// schema of eliminate duplicates is the child schema
 		this._schema = this._child.getSchema().copy();
+	}
+
+	equals(node: RANode): boolean {
+		if(node instanceof EliminateDuplicates) { // same type
+			return this._child.equals(node._child);
+		}
+		else {
+			return false;
+		}
 	}
 }

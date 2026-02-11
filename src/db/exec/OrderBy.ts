@@ -140,4 +140,25 @@ export class OrderBy extends RANodeUnary {
 		}
 		return list.join(', ');
 	}
+
+	equals(node: RANode): boolean {
+		if(node instanceof OrderBy) { // same type
+			if(this._orderCols.length !== node._orderCols.length) {
+				return false; // different number of order columns
+			}
+
+			for(let i = 0; i < this._orderCols.length; i++) { // for each order column
+				if(this._orderCols[i].getName() !== node._orderCols[i].getName()
+				   || this._orderCols[i].getRelAlias() !== node._orderCols[i].getRelAlias()
+				   || this._orderAsc[i] !== node._orderAsc[i]) {
+					return false; // different order columns or sort directions
+				}
+			}
+
+			return this._child.equals(node._child);
+		}
+		else {
+			return false;
+		}
+	}
 }

@@ -11,7 +11,7 @@ import { Schema } from './Schema';
 
 
 /**
- * relational algebra anti-join operator
+ * relational algebra rename columns operator
  *
  * the columns that should be renamed are added via `addRenaming()`
  */
@@ -121,4 +121,27 @@ export class RenameColumns extends RANodeUnary {
 
         return out.join(', ');
     }
+
+    equals(node: RANode): boolean {
+		if(node instanceof RenameColumns) { // same type
+			if(this._renameList.length !== node._renameList.length) {
+                return false; // different number of columns to rename
+            }
+
+            for(let i = 0; i < this._renameList.length; i++) { // for each column to rename
+                const e1 = this._renameList[i];
+                const e2 = node._renameList[i];
+
+                if(e1.newName !== e2.newName || e1.oldName !== e2.oldName
+                    || e1.oldRelAlias !== e2.oldRelAlias) {
+                    return false; // different new or old name
+                }
+            }
+
+            return this._child.equals(node._child);
+		}
+		else {
+			return false;
+		}
+	}
 }

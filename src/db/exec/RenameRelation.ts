@@ -8,7 +8,7 @@ import { RANode, RANodeUnary, Session } from './RANode';
 import { Schema } from './Schema';
 
 /**
- * relational algebra anti-join operator
+ * relational algebra rename relation operator
  *
  * @extends RANode
  * @constructor
@@ -58,5 +58,14 @@ export class RenameRelation extends RANodeUnary {
 
 	getArgumentHtml() {
 		return this._newRelAlias;
+	}
+
+	equals(node: RANode): boolean {
+		if(node instanceof RenameRelation) { // same type
+			return this._child.equals(node._child) && this._newRelAlias === node._newRelAlias;
+		}
+		else {
+			return false;
+		}
 	}
 }

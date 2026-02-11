@@ -239,16 +239,6 @@ export abstract class RANodeUnary extends RANode {
 			${wrap ? ')' : ''}`
 		);
 	}
-
-	equals(node: RANode): boolean {
-		if(node instanceof RANodeUnary) { // same type
-			return this._functionName === node._functionName // same function
-				&& this._child.equals(node.getChild()); // same child
-		}
-		else {
-			return false;
-		}
-	}
 }
 
 export abstract class RANodeBinary extends RANode {

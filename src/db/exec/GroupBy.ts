@@ -467,4 +467,34 @@ export class GroupBy extends RANodeUnary {
 		this.setResultNumRows(res.getNumRows());
 		return res;
 	}
+
+	equals(node: RANode): boolean {
+		if(node instanceof GroupBy) { // same type
+			if(this.groupByCols.length !== node.groupByCols.length
+			   || this.aggregateFunctions.length !== node.aggregateFunctions.length) {
+				return false; // different number of group by columns or aggregate functions
+			}
+
+			for(let i = 0; i < this.groupByCols.length; i++) { // for each group by column
+				if(this.groupByCols[i].name !== node.groupByCols[i].name
+				   || this.groupByCols[i].relAlias !== node.groupByCols[i].relAlias) {
+					return false; // different group by columns
+				}
+			}
+
+			for(let i = 0; i < this.aggregateFunctions.length; i++) { // for each aggregate function
+				if(this.aggregateFunctions[i].aggFunction !== node.aggregateFunctions[i].aggFunction
+				   || this.aggregateFunctions[i].name !== node.aggregateFunctions[i].name
+				   || this.aggregateFunctions[i].col.name !== node.aggregateFunctions[i].col.name
+				   || this.aggregateFunctions[i].col.relAlias !== node.aggregateFunctions[i].col.relAlias) {
+					return false; // different aggregate functions
+				}
+			}
+
+			return this._child.equals(node._child);
+		}
+		else {
+			return false;
+		}
+	}
 }

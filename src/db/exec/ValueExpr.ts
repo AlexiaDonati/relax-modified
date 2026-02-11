@@ -1311,8 +1311,17 @@ export class ValueExprGeneric extends ValueExpr {
 
 			// the order of arguments matters
 			for (let i = 0; i < this._args.length; i++) { // check arguments
-				if (!this._args[i].equals(other._args[i])) {
-					return false;
+				const a = this._args[i];
+				const b = other._args[i];
+				if (a && typeof a.equals === 'function') {
+					if (!a.equals(b)) {
+						return false;
+					}
+				}
+				else {
+					if (a !== b) {
+						return false;
+					}
 				}
 			}
 			return true;

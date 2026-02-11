@@ -394,4 +394,37 @@ export class Projection extends RANodeUnary {
 
 		return args.join(', ');
 	}
+
+	equals(node: RANode): boolean {
+		if(node instanceof Projection) { // same type
+			if (this._columns.length !== node._columns.length) { 
+				return false; // different number of columns
+			}
+
+			for (let i = 0; i < this._columns.length; i++) { // for each column in the projection
+				const col1 = this._columns[i];
+				const col2 = node._columns[i];
+
+				if (col1 instanceof Column && col2 instanceof Column) { // both are simple columns
+					if (col1.getName() !== col2.getName() || col1.getRelAlias() !== col2.getRelAlias()) {
+						return false; // different columns
+					}
+				}
+				else if (col1 instanceof Column || col2 instanceof Column) { // one is a simple column, the other is a projection column expression
+					return false; // different types of columns
+				}
+				else { // both are projection column expressions
+					if (col1.name !== col2.name || col1.relAlias !== col2.relAlias 
+						|| col1.child.equals(col2.child) === false) {
+						return false; // different columns
+					}
+				}
+			}
+
+			return this._child.equals(node._child);
+		}
+		else {
+			return false;
+		}
+	}
 }

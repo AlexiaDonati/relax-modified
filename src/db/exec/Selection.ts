@@ -186,4 +186,13 @@ export class Selection extends RANodeUnary {
 	getArgumentHtml() {
 		return this._condition.getFormulaHtml();
 	}
+
+	equals(node: RANode): boolean {
+		if(node instanceof Selection) { // same type
+			return this._child.equals(node._child) && this._condition.equals(node._condition);
+		}
+		else {
+			return false;
+		}
+	}
 }
