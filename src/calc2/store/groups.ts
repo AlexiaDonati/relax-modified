@@ -246,6 +246,13 @@ export function loadStaticGroups() {
 		id: string,
 	}[] = [
 		{
+			maintainerGroup: 'University of Liège',
+			maintainer: 'TP3',
+
+			source: 'local',
+			id: 'tp3_data',
+		},
+		{
 			maintainerGroup: t('calc.maintainer-groups.misc'),
 			maintainer: '',
 

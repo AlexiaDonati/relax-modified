@@ -245,13 +245,13 @@ export function loadStaticExercises() {
     }[] = [
         {
             source: 'local',
-            id: 'tp1',
-            maintainer: 'misc',
+            id: 'tp3',
+            maintainer: 'TP3',
         },
         /*
         {
             source: 'gist',
-            id: '844030c2b2c2b91d1ed7e4e55c77fd4b',
+            id: 'enter gist id here',
             maintainer: 'misc',
         },
         */

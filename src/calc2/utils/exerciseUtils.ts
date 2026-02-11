@@ -2,9 +2,9 @@
 import { Exercise, ExerciseInfo, SourceInfo, ExerciseSourceType, VerficationGroups } from 'calc2/store/exercise';
 import { Group, GroupSourceType } from 'calc2/store/groups';
 
-const ld_tp1: any = require('../data/tp1.txt');
+const ld_tp3: any = require('../data/tp3.txt');
 const LOCAL_DATA: { [id: string]: string } = {
-	'tp1': ld_tp1.default ? ld_tp1.default : '',
+	'tp3': ld_tp3.default ? ld_tp3.default : '',
 };
 
 export function parseExercisesFromDefinition(text: string, groupInfo: ExerciseInfo, sourceInfo: SourceInfo) {

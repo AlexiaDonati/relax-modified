@@ -9,10 +9,12 @@ import { parseRelalgGroup, relalgFromRelalgAstNode, replaceVariables } from 'db/
 import * as jQuery from 'jquery';
 import {string} from "prop-types";
 
+const ld_tp3_data: any = require('../data/tp3_data.txt');
 const ld_sb: any = require('../data/sb.txt');
 const ld_ufes: any = require('../data/ufes.txt');
 const ld: any = require('../data/uibk.txt');
 const LOCAL_DATA: { [id: string]: string } = {
+  'tp3_data': ld_tp3_data.default ? ld_tp3_data.default : '',
 	'sb': ld_sb.default ? ld_sb.default : '',
   'ufes': ld_ufes.default ? ld_ufes.default : '',
   'uibk': ld.default ? ld.default : '',
