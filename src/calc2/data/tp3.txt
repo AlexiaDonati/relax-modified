@@ -39,3 +39,8 @@ exercise: Exercice 2.4
 description: Rechercher la liste des destinations (départ et arrivée) des voyages ayant les mêmes destinations (départ et arrivée), éventuellement conduits par des personnes différentes, et pouvant s’effectuer à la fois en train et en avion.
 reference: π LIBELLE((π NO_DEST_TO (σNO_DEST_FROM=NO_DEST_TO (voyage) ⨝ train) ∩ π NO_DEST_TO (σNO_DEST_FROM=NO_DEST_TO (voyage) ⨝ avion)) ⨝ ρNO_DESTINATION←NO_DEST_TO (destination))
 dataset: local/tp3_data/local/1
+
+exercise: Exercice 3
+description: Rechercher la liste des destinations (départ et arrivée) des voyages ayant les mêmes destinations (départ et arrivée), éventuellement conduits par des personnes différentes, et pouvant s’effectuer à la fois en train et en avion.
+reference: πLIBELLE((πNO_DEST_TO,TYPE_VEHICULE (σNO_DEST_FROM=NO_DEST_TO (voyage) ⨝ véhicule) ÷ πTYPE_VEHICULE(véhicule)) ⨝ ρNO_DESTINATION←NO_DEST_TO(destination))
+dataset: local/tp3_data/local/2

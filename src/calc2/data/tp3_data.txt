@@ -153,3 +153,81 @@ NO_PERSONNE:number, NO_VOYAGE:number
 5, 104
 6, 105
 }
+
+group: Exercice 3 - Transport database (Vehicle unified)
+description: Database for the exercice 3 of TP3 on relational algebra.
+category@en: University of Liège
+
+véhicule = {
+NO_VEHICULE:string, TYPE_VEHICULE:string
+
+'T1', 'Train'
+'T2', 'Train'
+'T3', 'Train'
+'A1', 'Avion'
+'A2', 'Avion'
+'A3', 'Avion'
+}
+
+personne = {
+NO_PERSONNE:number, NOM:string, PRENOM:string
+
+1, 'Térieur', 'Alain'
+2, 'Martin', 'Sophie'
+3, 'Durand', 'Paul'
+4, 'Smith', 'Anna'
+5, 'Lopez', 'Carlos'
+6, 'Nguyen', 'Linh'
+}
+
+passager = {
+NO_PERSONNE:number
+
+3
+4
+5
+6
+}
+
+chauffeur = {
+NO_PERSONNE:number, PERMIS_TRAIN:string, PERMIS_AVION:string, DATE_EMBAUCHE:string
+
+1, Oui, Oui, '2015-06-01'
+2, Oui, Non, '2018-03-15'
+3, Non, Non, '2020-01-10'
+}
+
+destination = {
+NO_DESTINATION:number, LIBELLE:string
+
+1, 'Paris'
+2, 'Bruxelles'
+3, 'Honolulu'
+4, 'New York'
+}
+
+voyage = {
+NO_VOYAGE:number, NO_VEHICULE:string, NO_PERSONNE:number, NO_DEST_FROM:number, NO_DEST_TO:number
+
+100, 'A1', 1, 1, 4
+101, 'A2', 2, 2, 3
+102, 'T1', 2, 1, 3
+103, 'T2', 3, 2, 1
+104, 'A3', 3, 1, 2
+105, 'T3', 1, 3, 2
+106, 'T1', 4, 1, 1
+107, 'A1', 5, 1, 1
+}
+
+a_bord = {
+NO_PERSONNE:number, NO_VOYAGE:number
+
+3, 100
+4, 100
+5, 101
+3, 102
+6, 102
+4, 103
+5, 104
+6, 105
+}
