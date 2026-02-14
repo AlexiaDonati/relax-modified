@@ -283,14 +283,13 @@ example,  42
 
 					<div className="groups-container col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2">
 						<button className="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" onClick={this.toggleExerciseModal} style={{ width: '100%', textAlign: 'left', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-							<span>Select Exercise</span>
+							<span>Select Exercise { exercise? "( " + exercise.name + " )" : ""}</span>
 							<span className="caret" style={{ display: 'block', position: 'absolute', top: '50%', right: '10px' }}></span>
 						</button>
 						{exerciseMode && exercise !== undefined ?
 							<div>
-								<div>
-									<span> Exercise description: </span> {exercise.description}
-								</div>
+								<div>Exercise: {exercise.name}</div>
+								<div>Description: {exercise.description}</div>
 							</div>
 						: ''}
 					</div>
@@ -309,7 +308,7 @@ example,  42
 				</Modal>
 
 				<Modal isOpen={this.state.exerciseModal} toggle={this.toggleExerciseModal}>
-					<ModalHeader toggle={this.toggleExerciseModal}>TEST EXERCISE</ModalHeader>
+					<ModalHeader toggle={this.toggleExerciseModal}>{exercise? exercise.name : "Select Exercise"}</ModalHeader>
 					<ModalBody>
 						<MenuExerciseConnected exerciseLoaded={() => { this.setState({ exerciseModal: false }); }} />
 					</ModalBody>
