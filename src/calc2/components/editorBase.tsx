@@ -1826,7 +1826,7 @@ export class EditorBase extends React.Component<Props, State> {
 			this.clearExecutionAlerts();
 
 			if(query === referenceQuery) { // exact same syntax
-				this.setState({ verifyResult: "Queries string are identical" });
+				this.setState({ verifyResult: "Solution accepted : Queries string are identical." });
 
 				document.dispatchEvent(event);
 				this.toggle();
@@ -1844,7 +1844,7 @@ export class EditorBase extends React.Component<Props, State> {
 				const referenceResult = this.props.execFunction(this, referenceQuery, {line: 0, ch: 0}).result;
 				
 				if(execResult.props.root.equals(referenceResult.props.root)) { // equivalent syntax tree 
-					this.setState({ verifyResult: "ASTs are identical" });
+					this.setState({ verifyResult: "Solution accepted : ASTs are identical." });
 					
 					document.dispatchEvent(event);
 					this.toggle();
@@ -1878,7 +1878,7 @@ export class EditorBase extends React.Component<Props, State> {
 				}
 
 				if(!queryResult.equals(referenceQueryResult)) { // different results on reference data
-					this.setState({ verifyResult: "Results do not match on the reference dataset" });
+					this.setState({ verifyResult: "Solution rejected : Results do not match on the reference dataset." });
 
 					document.dispatchEvent(event);
 					this.toggle();
@@ -1908,7 +1908,7 @@ export class EditorBase extends React.Component<Props, State> {
 
 						// compare the tables
 						if(!queryTestResult.equals(referenceQueryTestResult)) { // different results on test data
-							this.setState({ verifyResult: "Results do not match on the test dataset " + i });
+							this.setState({ verifyResult: "Solution rejected : Results do not match on the test dataset number " + (i+1) + "." });
 
 							document.dispatchEvent(event);
 							this.toggle();
@@ -1921,7 +1921,7 @@ export class EditorBase extends React.Component<Props, State> {
 				// TODO ALEXIA : implement further tests (e.g., random tests , etc.)
 				
 				// if all tests passed
-				this.setState({ verifyResult: "Results passed all tests in place" });
+				this.setState({ verifyResult: "Solution accepted : Passed all tests in place." });
 
 				document.dispatchEvent(event);
 				this.toggle();
