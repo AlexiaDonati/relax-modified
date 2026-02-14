@@ -124,9 +124,9 @@ _nc 'optional whitespace without comments'
 = [\r\n\t ]*
 
 string 'string'
-= '"' [^"^\n]* '"'
-    { error(t('db.messages.parser.error-sql-string-use-single-quotes')); }
-/ '\'' a:$[^'^\n]* '\''
+= '"' a:$([^"\n]*) '"'
+    { return a; }
+/ '\'' a:$([^'\n]*) '\''
 	{ return a; }
 
 

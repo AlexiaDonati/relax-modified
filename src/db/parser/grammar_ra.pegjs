@@ -188,7 +188,10 @@ _sl // single line optional whitespace
 	{ return ''; }
 
 string 'string'
-= '\'' a:$[^'\n]* '\''
+= '\'' a:$[^'\\n]* '\''
+	{ return a; }
+/
+	'"' a:$([^"\\n]*) '"'
 	{ return a; }
 
 integer
