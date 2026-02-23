@@ -15,6 +15,7 @@ import classnames from 'classnames';
 import * as CodeMirror from 'codemirror';
 import 'codemirror/addon/hint/show-hint';
 import { RANode, RANodeBinary, RANodeUnary } from 'db/exec/RANode';
+import * as TableRA from 'src/db/exec/Table';
 import { forEachPreOrder } from 'db/translate/utils';
 import * as React from 'react';
 import { findDOMNode } from 'react-dom';
@@ -39,6 +40,7 @@ import {
 	faFileCsv  
 } from '@fortawesome/free-solid-svg-icons';
 import { Exercise } from '../store/exercise';
+import { PagedTable } from './pagedTable';
 
 require('codemirror/lib/codemirror.css');
 require('codemirror/theme/eclipse.css');
@@ -49,6 +51,8 @@ require('codemirror/addon/display/placeholder.js');
 require('codemirror/addon/display/autorefresh.js');
 require('codemirror/mode/sql/sql.js');
 require('handsontable/dist/handsontable.full.css');
+
+require('./result.scss');
 
 CodeMirror.defineMode('trc', function () {
 	const keywords = ['in', 'and', 'or', 'xor', 'not', 'implies', 'iff', 'exists', 'for all'];
@@ -538,6 +542,9 @@ type State = {
 	verifySuccessful: boolean,
 	isExecutionDisabled: boolean,
 	execResult: JSX.Element | null,
+	verifyExecResult: TableRA.Table | null,
+	verifyReferenceExecResult: TableRA.Table | null,
+	showHint: boolean,
 	relationEditorName: string,
 	replSelStart: any,
 	replSelEnd: any,
@@ -797,6 +804,9 @@ export class EditorBase extends React.Component<Props, State> {
 			execErrors: [],
 			isExecutionDisabled: false,
 			execResult: null,
+			verifyExecResult: null,
+			verifyReferenceExecResult: null,
+			showHint: false,
 			modal: false,
 			inlineRelationModal: false,
 			relationEditorName: '',
@@ -986,6 +996,9 @@ export class EditorBase extends React.Component<Props, State> {
 
 			execResult,
 			verifyResult,
+			verifyExecResult,
+			verifyReferenceExecResult,
+			showHint
 		} = this.state;
 
 		const {
@@ -1156,7 +1169,41 @@ export class EditorBase extends React.Component<Props, State> {
 							</TabPane>
 							{exerciseMode ? 
 								<TabPane tabId="verify">
-									{verifyResult}
+									<div>{verifyResult}</div>
+
+									<button 
+										type="button"
+										className={classnames('btn btn-secondary verify-button')}
+										onClick={() => { this.setState({ showHint: true }); }}
+									> 
+										Show expected resulting relation 
+									</button>
+
+									{showHint && verifyExecResult && verifyReferenceExecResult
+										? (
+											<div>
+												<div className="ra-result clearfix result result-table">
+													<div>The relation resulting from your query:</div>
+													<PagedTable
+														className="table table-condensed"
+														maxLinesPerPage={10}
+														table={verifyExecResult}
+														showPagination={true}
+													/>
+												</div>
+												<div className="ra-result clearfix result result-table">
+													<div>The relation resulting from the reference query:</div>
+													<PagedTable
+														className="table table-condensed"
+														maxLinesPerPage={10}
+														table={verifyReferenceExecResult}
+														showPagination={true}
+													/>
+												</div>
+											</div>
+										)
+										: null
+									}
 								</TabPane>
 							: ''}
 						</TabContent>
@@ -1808,6 +1855,10 @@ export class EditorBase extends React.Component<Props, State> {
 					<div className="rect4"></div>
 					<div className="rect5"></div>
 				</div>),
+				
+			verifyExecResult: null,
+			verifyReferenceExecResult: null,
+			showHint: false,
 		}, () => { // async to allow spinner to render
 			this.clearExecutionAlerts();
 
@@ -1878,7 +1929,11 @@ export class EditorBase extends React.Component<Props, State> {
 				}
 
 				if(!queryResult.equals(referenceQueryResult)) { // different results on reference data
-					this.setState({ verifyResult: "Solution rejected : Results do not match on the reference dataset." });
+					this.setState({ 
+						verifyResult: "Solution rejected : Results do not match on the reference dataset.",
+						verifyExecResult: queryResult,
+						verifyReferenceExecResult: referenceQueryResult
+					});
 
 					document.dispatchEvent(event);
 					this.toggle();
@@ -1908,7 +1963,11 @@ export class EditorBase extends React.Component<Props, State> {
 
 						// compare the tables
 						if(!queryTestResult.equals(referenceQueryTestResult)) { // different results on test data
-							this.setState({ verifyResult: "Solution rejected : Results do not match on the test dataset number " + (i+1) + "." });
+							this.setState({ 
+								verifyResult: "Solution rejected : Results do not match on the test dataset number " + (i+1) + ".",
+								verifyExecResult: queryTestResult,
+								verifyReferenceExecResult: referenceQueryTestResult,
+							});
 
 							document.dispatchEvent(event);
 							this.toggle();
