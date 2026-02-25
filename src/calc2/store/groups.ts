@@ -30,7 +30,7 @@ export type Action = (
 export function* rootSaga() {
 
 	yield saga.takeEvery('GROUPS_LOAD_REQUEST', function* (action: GROUPS_LOAD_REQUEST) {
-		const { source, id, setCurrent, maintainer, maintainerGroup} = action;
+		const { source, id, setCurrent, maintainer, maintainerGroup, hidden} = action;
 
 		const state: store.State = yield saga.select();
 
@@ -54,14 +54,13 @@ export function* rootSaga() {
 			};
 			yield saga.put(setCurrent);
 		}
-		else {
-			// fetch
+		else { // fetch
 			try {
 				if (source !== 'local' && source !== 'gist') {
 					throw new Error(`unsupported source-type ${source}`);
 				}
 
-				const loadedGroups: Group[] = yield saga.call(loadGroupsFromSource, source, id, maintainer, maintainerGroup);
+				const loadedGroups: Group[] = yield saga.call(loadGroupsFromSource, source, id, maintainer, maintainerGroup, hidden);
 				const success: GROUPS_LOAD_SUCCESS = {
 					type: 'GROUPS_LOAD_SUCCESS',
 					loadedGroups,
@@ -143,16 +142,17 @@ export type Group = {
 	exampleSQL?: string,
 	exampleBags?: string,
 	exampleRA?: string;
-	
 };
 export type GroupInfo = {
 	source: GroupSourceType,
 	id: string,
 	filename: string,
-	/** nth definition within the file */
-	index: number,
+	index: number, /** nth definition within the file */
+
 	maintainer: string,
 	maintainerGroup: string,
+
+	hidden: boolean,
 };
 export type SourceInfo = {
 	author?: string,
@@ -175,6 +175,8 @@ export type GROUPS_LOAD_REQUEST = {
 		filename: string,
 		index: number,
 	},
+
+	hidden: boolean,
 };
 
 type GROUPS_LOAD_SUCCESS = {
@@ -357,6 +359,8 @@ export function loadStaticGroups() {
 				setCurrent: first ? 'first' : undefined,
 				maintainer,
 				maintainerGroup,
+
+				hidden: false,
 			};
 
 			first = false;

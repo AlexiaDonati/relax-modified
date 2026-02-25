@@ -210,6 +210,7 @@ export const ConnectedCalc = connect((state: store.State) => {
 					filename,
 					index,
 				},
+				hidden: false,
 			};
 			dispatch(action);
 		},

@@ -44,6 +44,8 @@ export class EditorGroup extends React.Component<Props> {
 			index: 0,
 			maintainer: '',
 			maintainerGroup: '',
+
+			hidden: false,
 		};
 		const sourceInfo: SourceInfo = {};
 

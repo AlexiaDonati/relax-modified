@@ -69,6 +69,8 @@ export function* rootSaga() {
 
                         maintainer: exercise.exerciseInfo.maintainer,
                         maintainerGroup: 'misc',
+
+                        hidden: true, // do not show the verification groups of the exercise in the group overview
                     };
                     yield saga.put(actionGroup);
 

@@ -129,7 +129,7 @@ export function getGroupsFromGroupAst(groupAst: relalgAst.GroupRoot, groupInfo: 
 /**
  * loads group definition(s) from a (remote) location
  */
-export function loadGroupsFromSource(source: GroupSourceType, id: string, maintainer: string, maintainerGroup: string): Promise<Group[]> {
+export function loadGroupsFromSource(source: GroupSourceType, id: string, maintainer: string, maintainerGroup: string, hidden: boolean): Promise<Group[]> {
   return new Promise<Group[]>((resolve, reject) => {
 
     function gist_success(data: gist.Gist) {
@@ -147,8 +147,11 @@ export function loadGroupsFromSource(source: GroupSourceType, id: string, mainta
           id: data.id,
           filename,
           index: -1,
+          
           maintainer: maintainer,
           maintainerGroup: maintainerGroup,
+
+          hidden: hidden,
         };
 
         const sourceInfo: SourceInfo = {
@@ -200,8 +203,11 @@ export function loadGroupsFromSource(source: GroupSourceType, id: string, mainta
             id,
             filename: 'local',
             index: -1,
+
             maintainer: maintainer,
             maintainerGroup: maintainerGroup,
+
+            hidden: hidden,
           };
           const newGroups = parseGroupsFromDefinition(data, info, {});
 

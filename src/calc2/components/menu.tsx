@@ -44,6 +44,10 @@ export class Menu extends React.Component<Props> {
 		for (const group of groups.values()) {
 			let category: string | null = null;
 
+			if(group.groupInfo.hidden === true) {
+				continue;
+			}
+			
 			if (group.isDraft === true) {
 				category = i18n.t('calc.maintainer-groups.temp');
 			}
@@ -87,6 +91,11 @@ export class Menu extends React.Component<Props> {
 									<ul>
 										{groups.map((group: any, i: any) => {
 											const { groupName, groupInfo } = group;
+											
+											if(groupInfo.hidden === true) {
+												return null;
+											}
+
 											const path = `/relax-modified/calc/group/${groupInfo.source}/${groupInfo.id}/${groupInfo.filename}/${groupInfo.index}`;
 
 											return (
