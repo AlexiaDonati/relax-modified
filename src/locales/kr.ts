@@ -120,7 +120,7 @@ export const langKR = {
 	'calc.editors.ra.button-zoom-center': '화면에 맞추기',
 	'calc.editors.ra.toolbar.duplicate-elimination': '중복 제거',
 	'calc.editors.ra.toolbar.duplicate-elimination-content[0]':
-		'<b class="math">∂</b> <b>(</b> A <b>)</b>',
+		'<b class="math">∆</b> <b>(</b> A <b>)</b>',
 	'calc.editors.ra.toolbar.duplicate-elimination-content[1]':
 		'<br><b>delta</b> A',
 	'calc.editors.ra.toolbar.projection': '프로젝션',

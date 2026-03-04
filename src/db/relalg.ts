@@ -72,7 +72,7 @@ export function queryWithReplacedOperatorsFromAst(
 			'fullOuterJoinOperator': 'full outer join',
 		},
 		'plain2math': {
-			'delta': '∂',
+			'delta': '∆',
 			'pi': 'π',
 			'sigma': 'σ',
 			'rho': 'ρ',

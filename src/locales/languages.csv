@@ -194,12 +194,12 @@ calc.editors.ra.button-execute-query,execute query,Executar consulta,Query ausf�
 calc.editors.ra.button-execute-selection,execute selection,Executar seleção,Markierung ausführen,executar selección,셀렉션 실행,esegui selezione
 calc.editors.ra.button-download,download,Download,download,descargar,다운로드,scarica
 calc.editors.ra.toolbar.duplicate-elimination,duplicate elimination,duplicate elimination,duplicate elimination,duplicate elimination,duplicate elimination,eliminazione duplicati
-calc.editors.ra.toolbar.duplicate-elimination-content,"<b class=""math"">∂</b> <b>(</b> A <b>)</b>
-<br><b>delta</b> A","<b class=""math"">∂</b> <b>(</b> A <b>)</b>
-<br><b>delta</b> A","<b class=""math"">∂</b> <b>(</b> A <b>)</b>
-<br><b>delta</b> A","<b class=""math"">∂</b> <b>(</b> A <b>)</b>
-<br><b>delta</b> A","<b class=""math"">∂</b> <b>(</b> A <b>)</b>
-<br><b>delta</b> A","<b class=""math"">∂</b> <b>(</b> A <b>)</b>
+calc.editors.ra.toolbar.duplicate-elimination-content,"<b class=""math"">∆</b> <b>(</b> A <b>)</b>
+<br><b>delta</b> A","<b class=""math"">∆</b> <b>(</b> A <b>)</b>
+<br><b>delta</b> A","<b class=""math"">∆</b> <b>(</b> A <b>)</b>
+<br><b>delta</b> A","<b class=""math"">∆</b> <b>(</b> A <b>)</b>
+<br><b>delta</b> A","<b class=""math"">∆</b> <b>(</b> A <b>)</b>
+<br><b>delta</b> A","<b class=""math"">∆</b> <b>(</b> A <b>)</b>
 <br><b>delta</b> A"
 calc.editors.ra.toolbar.projection,projection,Projeção,Projektion,proyección,프로젝션,proiezione
 calc.editors.ra.toolbar.projection-content,"<b class=""math"">&pi;</b> a, b <b>(</b> A <b>)</b>
