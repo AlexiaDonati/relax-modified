@@ -353,7 +353,7 @@ export class Help extends React.Component<Props> {
 									</td>
 								</tr>
 								<tr>
-									<td className="math">∂</td>
+									<td className="math">∆</td>
 									<td>delta</td>
 								</tr>
 								<tr>
@@ -976,13 +976,18 @@ export class Help extends React.Component<Props> {
 								</div>
 							</div>
 
+							<hr />
 
 							<h3 id="relalg-unary-operations">Unary operations</h3>
+
 							Each unary operation follows the following syntax:
 							<div className="b-syntax">
 								<code><i>FUNCTION</i> ARGUMENT <strong>(</strong> CHILD_EXPRESSION <strong>)</strong></code>
 							</div>
+
 							The parentheses are Optional.
+							
+							<hr />
 
 							<div>
 								<h4 id="relalg-operations-projection">projection</h4>
@@ -997,44 +1002,19 @@ export class Help extends React.Component<Props> {
 											<td>pi</td>
 										</tr>
 										<tr>
-											<th>example</th>
+											<th>definition</th>
 											<td>
-												<code className="relalg">pi a, b ( R )</code>
+												<div className="math-block">Let R = (S, P).</div>
+												<div className="math-block">If S' &sube; S, then: &pi;<sub>S'</sub>(R) = (S', P').</div>
+												<p>Where: </p>
+												<div className="math-block">P' = &#123; t | &exist; t' &isin; P : t(S') = t'(S') &#125;</div>
 											</td>
 										</tr>
 									</tbody>
 								</table></div>
-								<p>The argument is a subset of columns of the schema of the <i>CHILD_EXPRESSION</i> or a <a
-										href="#relalg-valueexpr">value expression</a></p>
 
 								<div className="example">
-									<code>&pi; Customer.firstname, surname ( Customer )</code>
-								</div>
-
-								<div className="example">
-									<code>pi c.id, [1] ( &rho; c ( Customer ) )</code>
-								</div>
-
-								Expressions can be used to create more complex statements using one or more columns of a single row.
-
-								<div className="example">
-									<code>pi c.id, lower(username)-{'>'}user, concat(firstname, concat(' ', lastname))-{'>'}fullname (
-					&rho; c ( Customer )
-				)</code>
-								</div>
-
-								The virtual column <i>ROWNUM</i> used in previous versions is not supported any more but
-								the <code>rownum()</code> expression can be used to get the same information. And it can also be used
-								directly in the boolean condition of a selection or join.
-
-								<div className="example">
-									In this example the top 5 customers with the most orders are selected,
-									where countOrders could be the result of a previous aggregation.
-									<code>pi firstname, lastname
-				sigma rownum() {'<'}= 5
-				tau countOrders desc
-				Customer
-									</code>
+									<code>&pi; firstname, surname ( Customer )</code>
 								</div>
 
 								<div className="too-wide">
@@ -1045,9 +1025,12 @@ export class Help extends React.Component<Props> {
 														OneOrMore(NonTerminal('column', '#relalg-column'), ','),
 												),
 												NonTerminal('RA-expression', '#relalg-relalgexpr'),
-										)} />
+										)} 
+									/>
 								</div>
 							</div>
+
+							<hr />
 
 							<div>
 								<h4 id="relalg-operations-selection">selection</h4>
@@ -1062,16 +1045,16 @@ export class Help extends React.Component<Props> {
 											<td>sigma</td>
 										</tr>
 										<tr>
-											<th>example</th>
+											<th>definition</th>
 											<td>
-												<code className="relalg">sigma a {'>'} 2 ( R )</code>
+												<div className="math-block">Let R = (S, P) and F be a boolean expression over S.</div>
+												<div className="math-block">If S = &#123; A<sub>1</sub>, ..., A<sub>n</sub> &#125;, then: &sigma;<sub>F</sub>(R) = (S, P').</div>
+												<p>Where: </p>
+												<div className="math-block">P' = &#123; t | t &isin; P AND F[A<sub>i</sub> &larr; t(A<sub>i</sub>)] = <i>true</i> &#125;</div>
 											</td>
 										</tr>
 									</tbody>
 								</table></div>
-
-								<p>The argument is a <a href="#relalg-valueexpr">boolean expression</a> that each row of <i>CHILD_EXPRESSION</i>
-									is checked on</p>
 
 								<div className="example">
 									<code>&sigma; firstname = 'Bob' or firstname = 'Alice' ( Customer )</code>
@@ -1079,96 +1062,49 @@ export class Help extends React.Component<Props> {
 								<div className="example">
 									<code>&sigma; (id {'>'} 10 and id {'<'} 100) or id = 42 ( Customer )</code>
 								</div>
-								<div className="example">
-									Selecting all customers with a firstname that has an even length.
-									<code>&sigma; mod(length(firstname),2) = 0 ( Customer )</code>
-								</div>
 
 								<div className="too-wide">
 									<RailroadDiagram 
-											diagram={Diagram(
-												Sequence(
-														Choice(0, 'σ', 'sigma'),
-														NonTerminal('boolean-expression', '#relalg-valueexpr'),
-												),
-												NonTerminal('RA-expression', '#relalg-relalgexpr'),
-										)} />
+										diagram={Diagram(
+											Sequence(
+												Choice(0, 'σ', 'sigma'),
+												NonTerminal('boolean-expression', '#relalg-valueexpr'),
+											),
+											NonTerminal('RA-expression', '#relalg-relalgexpr'),
+										)} 
+									/>
 								</div>
 							</div>
 
+							<hr />
+
 							<div>
-								<h4 id="relalg-operations-renamerelation">rename relation</h4>
+								<h4 id="relalg-operations-renamecolumn">rename</h4>
 								<div className="scroll-x"><table className="table table-nonfluid">
 									<tbody>
 										<tr>
 											<th>symbol</th>
-											<td className="math">&rho;</td>
+											<td className="math">&rho; old ← new</td>
 										</tr>
 										<tr>
 											<th>alternative syntax</th>
-											<td>rho</td>
+											<td>rho old {'<'}- new</td>
 										</tr>
 										<tr>
-											<th>example</th>
+											<th>definition</th>
 											<td>
-												<code className="relalg">( R ) join R.a = X.b (rho X ( R ))</code>
-											</td>
-										</tr>
-									</tbody>
-								</table></div>
-
-								<div>
-									The argument is the new name for the Relation returned by <i>CHILD_EXPRESSION</i>
-
-									<div className="example">
-										rename the Relation from "Customer" to "a":
-										<code>&pi; a.id, a.firstname ( &rho; a ( Customer ) )</code>
-									</div>
-
-									<div className="too-wide">
-										<RailroadDiagram 
-											diagram={Diagram(
-													Sequence(
-															Choice(0, 'ρ', 'rho'),
-															NonTerminal('new relation name'),
-													),
-													NonTerminal('RA-expression', '#relalg-relalgexpr'),
-											)} />
-									</div>
-								</div>
-							</div>
-							<div>
-								<h4 id="relalg-operations-renamecolumn">rename column</h4>
-								<div className="scroll-x"><table className="table table-nonfluid">
-									<tbody>
-										<tr>
-											<th>symbol</th>
-											<td className="math">&rho;</td>
-										</tr>
-										<tr>
-											<th>alternative syntax</th>
-											<td>rho</td>
-										</tr>
-										<tr>
-											<th>example</th>
-											<td>
-												the old and the new column names in a list (see example) <br />
-												"←" can be substituted with "{'<'}-"
-												<code className="relalg block">{`pi x, b rho a->x {a, b
-						1, 2
-						3, 4
-					}`}</code>
+												<div className="math-block">Let R = (S, P).</div>
+												<div className="math-block">If S = &#123; A<sub>1</sub>, ..., A<sub>n</sub> &#125;, then: &rho;<sub>A←B</sub>(R) = (S', P').</div>
+												<p>Where: </p>
+												<div className="math-block">S' = S \ &#123;A&#125; &cup; &#123;B&#125;</div>
+												<div className="math-block">P' = &#123; t | &exist; t' &isin; P : t(B) = t'(A) AND &forall; A<sub>i</sub> &ne; A : t(A<sub>i</sub>) = t'(A<sub>i</sub>) &#125;</div>
 											</td>
 										</tr>
 									</tbody>
 								</table></div>
 								<div>
-									The argument is the old and the new column names in a list (see example) <br />
-									"←" can be substituted with "{'<'}-"
-
 									<div className="example">
-										rename the columns id and firstname to myId and foobar:
-										<code>&rho; myId←id, foobar←firstname (&pi; id, firstname ( Customer ) )</code>
+										<code>&rho; firstname←foobar (&pi; id, firstname ( Customer ) )</code>
 									</div>
 
 									<div className="too-wide">
@@ -1176,22 +1112,22 @@ export class Help extends React.Component<Props> {
 											diagram={
 												Diagram(
 													Sequence(
-															Choice(0, 'ρ', 'rho'),
-															OneOrMore(
-																	Choice(0,
-																			Sequence(
-																					NonTerminal('new name'),
-																					Choice(0, '←', '<-'),
-																					NonTerminal('column', '#relalg-column'),
-																			),
-																			Sequence(
-																					NonTerminal('column', '#relalg-column'),
-																					Choice(0, '→', '->'),
-																					NonTerminal('new name'),
-																			),
-																	),
-																	',',
+														Choice(0, 'ρ', 'rho'),
+														OneOrMore(
+															Choice(0,
+																Sequence(
+																	NonTerminal('column', '#relalg-column'),
+																	Choice(0, '←', '<-'),
+																	NonTerminal('new name'),
+																),
+																Sequence(
+																	NonTerminal('new name'),
+																	Choice(0, '→', '->'),
+																	NonTerminal('column', '#relalg-column'),
+																),
 															),
+															',',
+														),
 													),
 													NonTerminal('RA-expression', '#relalg-relalgexpr'),
 												)
@@ -1200,6 +1136,8 @@ export class Help extends React.Component<Props> {
 									</div>
 								</div>
 							</div>
+							
+							<hr />
 
 							<div>
 								<h4 id="relalg-operations-orderby">order by</h4>
@@ -1213,45 +1151,44 @@ export class Help extends React.Component<Props> {
 											<th>alternative syntax</th>
 											<td>tau</td>
 										</tr>
-										<tr>
-											<th>example</th>
-											<td>
-												<code className="relalg">tau a asc, b desc ( R )</code>
-											</td>
-										</tr>
 									</tbody>
 								</table></div>
 
 								<div>
-									The argument is a list of columns by which the relation should be ordered (see examples)
-
 									<div className="example">
-										order the result by the first column (default is ascending) and the second column descending:
-										<code>&tau; [1], firstname desc (&pi; id, firstname ( Customer ) )</code>
+										<code>&tau; id asc, score (&pi; id, firstname, score ( Student ) )</code>
 									</div>
 
 									<div className="too-wide">
 										<RailroadDiagram 
 											diagram={Diagram(
-													Sequence(
-															Choice(0, 'τ', 'tau'),
-															OneOrMore(
-																	Sequence(
-																			NonTerminal('column', '#relalg-column'),
-																			Choice(0,
-																					Skip(),
-																					'asc',
-																					'desc',
-																			),
-																	),
-																	',',
+												Sequence(
+													Choice(0, 'τ', 'tau'),
+													OneOrMore(
+														Sequence(
+															NonTerminal('column', '#relalg-column'),
+															Choice(0,
+																Skip(),
+																'asc',
+																'desc',
 															),
+														),
+														',',
 													),
-													NonTerminal('RA-expression', '#relalg-relalgexpr'),
-											)} />
+												),
+												NonTerminal('RA-expression', '#relalg-relalgexpr'),
+											)} 
+										/>
 									</div>
+									
+									<div className="alert alert-info">
+										If the direction is not specified the default is ascending order.
+									</div>
+
 								</div>
 							</div>
+
+							<hr />
 
 							<div>
 								<h4 id="relalg-operations-groupby">group by</h4>
@@ -1265,12 +1202,6 @@ export class Help extends React.Component<Props> {
 											<th>alternative syntax</th>
 											<td>gamma</td>
 										</tr>
-										<tr>
-											<th>example</th>
-											<td>
-												<code className="relalg">gamma a; count(*)-{'>'}x ( R )</code>
-											</td>
-										</tr>
 									</tbody>
 								</table></div>
 								<div>
@@ -1278,11 +1209,9 @@ export class Help extends React.Component<Props> {
 									<br />and a list of aggregate functions to apply with their new name in form <span>AGG( COLUMN ) -{'>'} NEW_NAME</span>
 
 									<div className="example">
-										group the result by columns a and b, and within each group sum the values in c into a column named x:
+										group the result by columns a and b, and within each group sum the values in c into a column named x: <br />
 										<code>&gamma; a, b ; sum(c)-{'>'}x ( Customer )</code>
 									</div>
-
-									<p>If no grouping columns are provided the entire relation is the group.</p>
 
 									<div>supported aggregate functions by type:
 										<div className="scroll-x"><table className="table">
@@ -1296,16 +1225,16 @@ export class Help extends React.Component<Props> {
 											</thead>
 											<tbody>
 												<tr>
-													<th>COUNT( * )</th>
+													<th>SUM( column )</th>
 													<td>yes</td>
-													<td>yes</td>
-													<td>yes</td>
+													<td>no</td>
+													<td>no</td>
 												</tr>
 												<tr>
-													<th>COUNT( column )</th>
+													<th>AVG( column )</th>
 													<td>yes</td>
-													<td>yes</td>
-													<td>yes</td>
+													<td>no</td>
+													<td>no</td>
 												</tr>
 												<tr>
 													<th>MIN( column )</th>
@@ -1320,52 +1249,57 @@ export class Help extends React.Component<Props> {
 													<td>yes</td>
 												</tr>
 												<tr>
-													<th>SUM( column )</th>
+													<th>COUNT( * )</th>
 													<td>yes</td>
-													<td>no</td>
-													<td>no</td>
+													<td>yes</td>
+													<td>yes</td>
 												</tr>
 												<tr>
-													<th>AVG( column )</th>
+													<th>COUNT( column )</th>
 													<td>yes</td>
-													<td>no</td>
-													<td>no</td>
+													<td>yes</td>
+													<td>yes</td>
 												</tr>
 											</tbody>
 										</table></div>
 									</div>
-								{/*
+								
 									<div className="too-wide">
 										<RailroadDiagram 
 											diagram={Diagram(
-													Stack(
+												Sequence(
+													Choice(0, 'γ', 'gamma'),
+													Sequence(
+														ZeroOrMore(NonTerminal('column', '#relalg-column'), ','),
+														';',
+														OneOrMore(
 															Sequence(
-																	Choice(0, 'γ', 'gamma'),
+																Choice(0,
+																	'COUNT(*)',
 																	Sequence(
-																			ZeroOrMore(NonTerminal('column', '#relalg-column'), ','),
-																			';',
-																			OneOrMore(
-																					Sequence(
-																							Choice(0,
-																									'COUNT(*)',
-																									Sequence(
-																											Choice(0, 'COUNT', 'MIN', 'MAX', 'SUM', 'AVG'),
-																											'(', NonTerminal('column', '#relalg-column'), ')',
-																									),
-																							),
-																							Choice(0, '→', '->'),
-																							NonTerminal('new name'),
-																					),
-																					',',
-																			),
+																		Choice(0, 'COUNT', 'MIN', 'MAX', 'SUM', 'AVG'),
+																		'(', NonTerminal('column', '#relalg-column'), ')',
 																	),
+																),
+																Choice(0, '→', '->'),
+																NonTerminal('new name'),
 															),
-															NonTerminal('RA-expression', '#relalg-relalgexpr'),
+															',',
+														),
 													),
-											)} />
-																									</div> */}
+												),
+												NonTerminal('RA-expression', '#relalg-relalgexpr'),
+											)} 
+										/>
+									</div>
+
+									<div className="alert alert-info">
+										If no grouping columns are provided the entire relation is the group.
+									</div>
 								</div>
 							</div>
+
+							<hr />
 
 							<div>
 								<h4 id="relalg-operations-duplicate-elimination">duplicate elimination</h4>
@@ -1374,25 +1308,18 @@ export class Help extends React.Component<Props> {
 									<tbody>
 										<tr>
 											<th>symbol</th>
-											<td className="math">∂</td>
+											<td className="math">∆</td>
 										</tr>
 										<tr>
 											<th>alternative syntax</th>
 											<td>delta</td>
 										</tr>
-										<tr>
-											<th>example</th>
-											<td>
-												<code className="relalg">delta ( R )</code>
-											</td>
-										</tr>
 									</tbody>
 									</table>
 								</div>
-								<p>There is no argument</p>
 
 								<div className="example">
-									<code>∂ ( Customer )</code>
+									<code>∆ ( Customer )</code>
 								</div>
 
 								<div className="example">
@@ -1401,14 +1328,17 @@ export class Help extends React.Component<Props> {
 
 								<div className="too-wide">
 									<RailroadDiagram 
-											diagram={Diagram(
-												Sequence(
-														Choice(0, '∂', 'delta'),
-												),
-												NonTerminal('RA-expression', '#relalg-relalgexpr'),
-										)} />
+										diagram={Diagram(
+											Sequence(
+												Choice(0, '∆', 'delta'),
+											),
+											NonTerminal('RA-expression', '#relalg-relalgexpr'),
+										)} 
+									/>
 								</div>
 							</div>
+
+							<hr />
 
 							<h3 id="relalg-binary-operations">Binary operations</h3>
 							Each binary operation follows the following syntax:
@@ -1416,43 +1346,13 @@ export class Help extends React.Component<Props> {
 								<code><strong>(</strong> CHILD_EXPRESSION <strong>)</strong> <strong>FUNCTION</strong> ARGUMENT <strong>(</strong>
 									CHILD_EXPRESSION <strong>)</strong></code>
 							</div>
+							
 							The parentheses are Optional.
 
+							<hr />
+							
 							<div>
-								<h4 id="relalg-operations-intersection">intersection - &cap;</h4>
-								<div className="scroll-x"><table className="table table-nonfluid">
-									<tbody>
-										<tr>
-											<th>symbol</th>
-											<td className="math">&cap;</td>
-										</tr>
-										<tr>
-											<th>alternative syntax</th>
-											<td>intersect</td>
-										</tr>
-									</tbody>
-								</table></div>
-								<div>no argument
-
-									<div className="example">
-										<code>( Customer ) &cap; ( Customer )</code>
-									</div>
-									the schemas must be unifiable
-
-									<div className="too-wide">
-										<RailroadDiagram 
-											diagram={Diagram(
-													NonTerminal('RA-expression', '#relalg-relalgexpr'),
-													Sequence(
-															Choice(0, '∩', 'intersect'),
-													),
-													NonTerminal('RA-expression', '#relalg-relalgexpr'),
-											)} />
-									</div>
-								</div>
-							</div>
-							<div>
-								<h4 id="relalg-operations-union">union - &cup;</h4>
+								<h4 id="relalg-operations-union">union</h4>
 								<div className="scroll-x"><table className="table table-nonfluid">
 									<tbody>
 										<tr>
@@ -1463,27 +1363,212 @@ export class Help extends React.Component<Props> {
 											<th>alternative syntax</th>
 											<td>union</td>
 										</tr>
+										<tr>
+											<th>definition</th>
+											<td>
+												<p>Let R₁ = (S₁, P₁) and R₂ = (S₂, P₂).</p>
+												<p>If S₁ = S₂ = S, then:</p>
+												<div className="math-block">R₁ &cup; R₂ = (S, P₁ &cup; P₂)</div>
+												<p>where:</p>
+												<div className="math-block">
+													P₁ &cup; P₂ = &#123; t | t ∈ P₁ OR t ∈ P₂ &#125;
+												</div>
+											</td>
+										</tr>
 									</tbody>
 								</table></div>
-								<div>no argument
 
+								<div>
 									<div className="example">
 										<code>( Customer ) &cup; ( Customer )</code>
 									</div>
-									the schemas must be unifiable
+
+									<div className="too-wide">
+										<RailroadDiagram 
+											diagram={Diagram(
+												NonTerminal('RA-expression', '#relalg-relalgexpr'),
+												Sequence(
+														Choice(0, '∪', 'union'),
+												),
+												NonTerminal('RA-expression', '#relalg-relalgexpr'),
+											)} 
+										/>
+									</div>
+									
+									<div className="alert alert-info">
+										The schemas must be identical (same attributes and same domains).
+									</div>
+									
+									<div className="alert alert-secondary">
+										Note: The ∪ operator on relations is different from the ∪ operator on sets.
+									</div>
+								</div>
+							</div>
+
+							<hr />
+
+							<div>
+								<h4 id="relalg-operations-subtraction">subtraction</h4>
+								<div className="scroll-x"><table className="table table-nonfluid">
+									<tbody>
+										<tr>
+											<th>symbol</th>
+											<td className="math">-</td>
+										</tr>
+										<tr>
+											<th>alternative syntax</th>
+											<td>\<br />
+												except
+											</td>
+										</tr>
+										<tr>
+											<th>definition</th>
+											<td>
+												<p>Let R₁ = (S₁, P₁) and R₂ = (S₂, P₂).</p>
+												<p>If S₁ = S₂ = S, then:</p>
+												<div className="math-block">R₁ - R₂ = (S, P₁ \ P₂)</div>
+												<p>where:</p>
+												<div className="math-block">
+													P₁ \ P₂ = &#123; t | t ∈ P₁ AND t ∉ P₂ &#125;
+												</div>
+											</td>
+										</tr>
+									</tbody>
+								</table></div>
+
+								<div>
+									<div className="example">
+										<code>( &pi; id (Order) ) - ( &pi; id (Cancellation) )</code>
+									</div>
 
 									<div className="too-wide">
 										<RailroadDiagram 
 											diagram={Diagram(
 													NonTerminal('RA-expression', '#relalg-relalgexpr'),
 													Sequence(
-															Choice(0, '∪', 'union'),
+															Choice(0, '-', '\\', 'except'),
 													),
 													NonTerminal('RA-expression', '#relalg-relalgexpr'),
-											)} />
+											)} 
+										/>
+									</div>
+
+									<div className="alert alert-info">
+										The schemas must be identical (same attributes and same domains).
+									</div>
+
+								</div>
+							</div>
+
+							<hr />
+							
+							<div>
+								<h4 id="relalg-operations-intersection">intersection</h4>
+								<div className="scroll-x"><table className="table table-nonfluid">
+									<tbody>
+										<tr>
+											<th>symbol</th>
+											<td className="math">&cap;</td>
+										</tr>
+										<tr>
+											<th>alternative syntax</th>
+											<td>intersect</td>
+										</tr>
+										<tr>
+											<th>definition</th>
+											<td>
+												<p>Let R₁ = (S₁, P₁) and R₂ = (S₂, P₂).</p>
+												<p>If S₁ = S₂ = S, then:</p>
+												<div className="math-block">R₁ &cap; R₂ = (S, P₁ &cap; P₂)</div>
+												<p>where:</p>
+												<div className="math-block">
+													P₁ &cap; P₂ = &#123; t | t ∈ P₁ AND t ∈ P₂ &#125;
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th>equivalent syntax</th>
+											<td>R₁ &cap; R₂ = R₁ - ( R₁ - R₂ )</td>
+										</tr>
+									</tbody>
+								</table></div>
+
+								<div>
+									<div className="example">
+										<code>( Customer ) &cap; ( Customer )</code>
+									</div>
+									
+									<div className="too-wide">
+										<RailroadDiagram 
+											diagram={Diagram(
+													NonTerminal('RA-expression', '#relalg-relalgexpr'),
+													Sequence(
+															Choice(0, '∩', 'intersect'),
+													),
+													NonTerminal('RA-expression', '#relalg-relalgexpr'),
+											)} 
+										/>
+									</div>
+
+									<div className="alert alert-info">
+										The schemas must be identical (same attributes and same domains).
 									</div>
 								</div>
 							</div>
+
+							<hr />
+
+							<div>
+								<h4 id="relalg-operations-crossjoin">cartesian product</h4>
+								<div className="scroll-x"><table className="table table-nonfluid">
+									<tbody>
+										<tr>
+											<th>symbol</th>
+											<td className="math">⨯</td>
+										</tr>
+										<tr>
+											<th>alternative syntax</th>
+											<td>cross join</td>
+										</tr>
+										<tr>
+											<th>definition</th>
+											<td>
+												<p>Let R₁ = (S₁, P₁) and R₂ = (S₂, P₂).</p>
+												<p>If S₁ &cap; S₂ = &empty;, then:</p>
+												<div className="math-block">R₁ ⨯ R₂ = (S₁ ∪ S₂, P₁ × P₂)</div>
+												<p>where:</p>
+												<div className="math-block">
+													P₁ × P₂ = &#123; t | &exist; u &isin; P₁ : &exist; v &isin; P₂ : t(S₁) = u AND t(S₂) = v &#125;
+												</div>
+											</td>
+										</tr>
+									</tbody>
+								</table></div>
+								<div>
+									<div className="example">
+										<code>( Menu ) ⨯ ( Discount )</code>
+									</div>
+
+									<div className="too-wide">
+										<RailroadDiagram 
+											diagram={Diagram(
+													NonTerminal('RA-expression', '#relalg-relalgexpr'),
+													Sequence(
+															Choice(0, '⨯', Sequence('cross', 'join')),
+													),
+													NonTerminal('RA-expression', '#relalg-relalgexpr'),
+											)} 
+										/>
+									</div>
+
+									<div className="alert alert-info">
+										The schemas must be different (no common attributes).
+									</div>
+								</div>
+							</div>
+
+							<hr />
+
 							<div>
 								<h4 id="relalg-operations-division">division</h4>
 								<div className="scroll-x"><table className="table table-nonfluid">
@@ -1496,14 +1581,30 @@ export class Help extends React.Component<Props> {
 											<th>alternative syntax</th>
 											<td>/</td>
 										</tr>
+										<tr>
+											<th>definition</th>
+											<td>
+												<p>Let R₁ = (S₁, P₁) and R₂ = (S₂, P₂).</p>
+												<p>If S₂ &sube; S₁, then:</p>
+												<div className="math-block">R₁ ÷ R₂ = (S₁ \ S₂, P)</div>
+												<p>where:</p>
+												<div className="math-block">
+													P = &#123; t | &forall; t<sub>s</sub> &isin; P₂, &exist; t<sub>r</sub> &isin; P₁ : t<sub>r</sub>(S₂) = t<sub>s</sub> AND t<sub>r</sub>(S₁\S₂) = t&#125;
+												</div>
+												<p>In other words, R₁ ÷ R₂ is the subset R' of π<sub>S₁-S₂</sub>(R₁) that is maximal such that (R' ⨯ R₂) &sube; R₁.</p>
+											</td>
+										</tr>
+										<tr>
+											<th>equivalent syntax</th>
+											<td>R₁ ÷ R₂ = π<sub>S₁\S₂</sub>(R₁) - π<sub>S₁\S₂</sub>((π<sub>S₁\S₂</sub>(R₁) ⨯ R₂) - R₁)</td>
+										</tr>
 									</tbody>
 								</table></div>
-								<div>no argument
+								<div>
 
 									<div className="example">
-										<code>( Customer ) ÷ ( Customer )</code>
+										<code>&pi; product, certificate ( Tests ) ÷ &pi; certificate (&sigma; region = "EU" ( Certification ) )</code>
 									</div>
-									the schemas must be unifiable
 
 									<div className="too-wide">
 										<RailroadDiagram 
@@ -1513,122 +1614,21 @@ export class Help extends React.Component<Props> {
 															Choice(0, '÷', '/'),
 													),
 													NonTerminal('RA-expression', '#relalg-relalgexpr'),
-											)} />
+											)} 
+										/>
+									</div>
+
+									<div className="alert alert-info">
+										The schemas must be identical (same attributes and same domains).
+									</div>
+									<div className="alert alert-secondary">
+										Note: The relational algebra division operator, as defined here for sets, does not return the expected result from a division on multisets.
 									</div>
 								</div>
 							</div>
-							<div>
-								<h4 id="relalg-operations-subtraction">subtraction / set-difference</h4>
-								<div className="scroll-x"><table className="table table-nonfluid">
-									<tbody>
-										<tr>
-											<th>-</th>
-											<td className="math">&cup;</td>
-										</tr>
-										<tr>
-											<th>alternative syntax</th>
-											<td>\<br />
-												except
-											</td>
-										</tr>
-									</tbody>
-								</table></div>
-								<div>no argument
 
-									<div className="example">
-										<code>( pi firstname ( Customer ) ) - ( rho test{'<'}-lastname (
-					pi lastname ( Customer )
-				) )</code>
-									</div>
-									the schemas must be unifiable
+							<hr />
 
-									<div className="too-wide">
-										<RailroadDiagram 
-											diagram={Diagram(
-													NonTerminal('RA-expression', '#relalg-relalgexpr'),
-													Sequence(
-															Choice(0, '-', '\\', 'except'),
-													),
-													NonTerminal('RA-expression', '#relalg-relalgexpr'),
-											)} />
-									</div>
-								</div>
-							</div>
-							<div>
-								<h4 id="relalg-operations-crossjoin">cross product</h4>
-								<div className="scroll-x"><table className="table table-nonfluid">
-									<tbody>
-										<tr>
-											<th>symbol</th>
-											<td className="math">⨯</td>
-										</tr>
-										<tr>
-											<th>alternative syntax</th>
-											<td>cross join</td>
-										</tr>
-									</tbody>
-								</table></div>
-								<div>no argument
-									<div className="too-wide">
-										<RailroadDiagram 
-											diagram={Diagram(
-													NonTerminal('RA-expression', '#relalg-relalgexpr'),
-													Sequence(
-															Choice(0, '⨯', Sequence('cross', 'join')),
-													),
-													NonTerminal('RA-expression', '#relalg-relalgexpr'),
-											)} />
-									</div>
-								</div>
-							</div>
-							<div>
-								<h4 id="relalg-operations-innerjoin">Theta-join / θ-join</h4>
-								<div className="scroll-x"><table className="table table-nonfluid">
-									<tbody>
-										<tr>
-											<th>symbol</th>
-											<td className="math">⋈</td>
-										</tr>
-										<tr>
-											<th>alternative syntax</th>
-											<td>join<br />inner join</td>
-										</tr>
-									</tbody>
-								</table></div>
-								<div>join condition
-									<div className="too-wide">
-										{/*
-										<RailroadDiagram 
-											diagram={Diagram(
-													Stack(
-															Sequence(
-																	NonTerminal('RA-expression', '#relalg-relalgexpr'),
-																	Sequence(
-																			Choice(0, '⋈', Sequence(Optional('inner'), 'join')),
-																			NonTerminal('boolean-expression', '#relalg-valueexpr'),
-																	),
-															),
-															NonTerminal('RA-expression', '#relalg-relalgexpr'),
-													),
-											)} />
-											*/}
-									</div>
-								</div>
-
-								<p>
-									Special case:<br />
-									The name of a single boolean column (like <code>R join a S</code>) can not be used directly
-									as a join condition due to ambiguities in the relational algebra syntax.<br />
-
-									The column must either be specified with its qualifier (<code>R join R.a S</code>) or wrapped in
-									parentheses (<code>R join (a) S</code>).<br />
-
-									This is not necessary for more complex boolean expressions. The problem is only that the single
-									column name
-									can not be distinguished from a relation name: the expression <code>X=R join S X</code> could be
-									interpreted as <code>A=(R join S A)</code> instead of <code>A=(R join S) A</code>.
-								</p>
-							</div>
 							<div>
 								<h4 id="relalg-operations-naturaljoin">natural join</h4>
 								<div className="scroll-x"><table className="table table-nonfluid">
@@ -1641,98 +1641,95 @@ export class Help extends React.Component<Props> {
 											<th>alternative syntax</th>
 											<td>join<br />natural join</td>
 										</tr>
+										<tr>
+											<th>definition</th>
+											<td>
+												<p>Let R₁ = (S₁, P₁) and R₂ = (S₂, P₂).</p>
+												<p>If S₁ &cap; S₂ = &empty;, then the definition of the cartesian product applies.</p>
+												<p>Otherwise, R₁ ⋈ R₂ = (S₁ &cup; S₂, P)</p>
+												<p>where:</p>
+												<div className="math-block">
+													P = &#123; t | &exist; u &isin; P₁ : &exist; v &isin; P₂ : t(S₁) = u AND t(S₂) = v &#125;
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th>equivalent syntax</th>
+											<td>R₁ ⋈ R₂ = &pi;<sub>S₁&cup;S₂</sub> (&sigma;<sub>A₁=A₁' AND ... AND Aₙ=Aₙ'</sub> (R₁ ⨯ &rho; <sub>A₁←A₁', ..., Aₙ←Aₙ'</sub>(R₂)))</td>
+										</tr>
 									</tbody>
 								</table></div>
-								<div>no argument
+
+								<div>
 
 									<div className="example">
-										<code className="block">&rho; a ( Customer )
-				<span className="math">⋈</span> a.name {'<'} b.name ( &rho; b ( Customer ) )</code>
+										<code className="block">( Customer ) ⋈ ( Order )</code>
 									</div>
 
-									<div className="too-wide">
-										{/** 
+									<div className="too-wide"> 
 										<RailroadDiagram 
 											diagram={Diagram(
+												NonTerminal('RA-expression', '#relalg-relalgexpr'),
+												Sequence(
+													Choice(0, '⋈', 'join', Sequence('natural', 'join')),
+												),
+												NonTerminal('RA-expression', '#relalg-relalgexpr'),
+											)} 
+										/>
+									</div>
+								</div>
+							</div>
+
+							<hr />
+
+							<div>
+								<h4 id="relalg-operations-innerjoin">Theta-join / θ-join</h4>
+								<div className="scroll-x"><table className="table table-nonfluid">
+									<tbody>
+										<tr>
+											<th>symbol</th>
+											<td className="math">⋈</td>
+										</tr>
+										<tr>
+											<th>alternative syntax</th>
+											<td>join<br />inner join</td>
+										</tr>
+										<tr>
+											<th>definition</th>
+											<td>
+												<p>Let R₁ = (S₁, P₁) and R₂ = (S₂, P₂).</p>
+												<p>Let A<sub>R</sub> &isin; S₁ and A<sub>S</sub> &isin; S₂.</p>
+												<p>R₁ ⋈<sub>A<sub>R</sub> θ A<sub>S</sub></sub> R₂ = &sigma;<sub>A<sub>R</sub> θ A<sub>S</sub></sub> (R₁ ⨯ R₂)</p>
+											</td>
+										</tr>
+									</tbody>
+								</table></div>
+
+								<div>
+									<div className="too-wide">
+										<RailroadDiagram 
+											diagram={Diagram(
+												Sequence(
 													NonTerminal('RA-expression', '#relalg-relalgexpr'),
 													Sequence(
-															Choice(0, '⋈', Sequence('natural', 'join')),
+														Choice(0, '⋈', 'join', Sequence('inner', 'join')),
+														NonTerminal('boolean-expression', '#relalg-valueexpr'),
 													),
-													NonTerminal('RA-expression', '#relalg-relalgexpr'),
-											)} />
-											*/}
+												),
+												NonTerminal('RA-expression', '#relalg-relalgexpr'),
+											)} 
+										/>	
 									</div>
-								</div>
-							</div>
-							<div>
-								<h4 id="relalg-operations-leftjoin">left outer join</h4>
-								<div className="scroll-x"><table className="table table-nonfluid">
-									<tbody>
-										<tr>
-											<th>symbol</th>
-											<td className="math">⟕</td>
-										</tr>
-										<tr>
-											<th>alternative syntax</th>
-											<td>left outer join<br />left join</td>
-										</tr>
-									</tbody>
-								</table></div>
-								<div>optional join condition; if no join condition is given it acts as a natural left outer join
-									<div className="too-wide">
-										{/**
-										<RailroadDiagram 
-											diagram={Diagram(
-													Stack(
-															Sequence(
-																	NonTerminal('RA-expression', '#relalg-relalgexpr'),
-																	Sequence(
-																			Choice(0, '⟕', Sequence('left', Optional('outer'), 'join')),
-																			Optional(NonTerminal('boolean-expression', '#relalg-valueexpr')),
-																	),
-															),
-															NonTerminal('RA-expression', '#relalg-relalgexpr'),
-													),
-											)} />
 
-											 */}
+									<div className="alert alert-info">
+										The name of a single boolean column (<code>R join a S</code>) can not be used directly as a join condition<br /> 
+										and must be wrapped in parentheses (<code>R join (a) S</code>) due to ambiguities in the relational algebra syntax.<br />
 									</div>
 								</div>
 							</div>
-							<div>
-								<h4 id="relalg-operations-rightjoin">right outer join</h4>
-								<div className="scroll-x"><table className="table table-nonfluid">
-									<tbody>
-										<tr>
-											<th>symbol</th>
-											<td className="math">⟖</td>
-										</tr>
-										<tr>
-											<th>alternative syntax</th>
-											<td>right outer join<br />right join</td>
-										</tr>
-									</tbody>
-								</table></div>
-								<div>optional join condition; if no join condition is given it acts as a natural right outer join
-									<div className="too-wide">
-										{/** 
-										<RailroadDiagram 
-											diagram={Diagram(
-													Stack(
-															Sequence(
-																	NonTerminal('RA-expression', '#relalg-relalgexpr'),
-																	Sequence(
-																			Choice(0, '⟖', Sequence('right', Optional('outer'), 'join')),
-																			Optional(NonTerminal('boolean-expression', '#relalg-valueexpr')),
-																	),
-															),
-															NonTerminal('RA-expression', '#relalg-relalgexpr'),
-													),
-											)} />
-											 */}
-									</div>
-								</div>
-							</div>
+
+							<hr />
+							
 							<div>
 								<h4 id="relalg-operations-fulljoin">full outer join</h4>
 								<div className="scroll-x"><table className="table table-nonfluid">
@@ -1747,26 +1744,109 @@ export class Help extends React.Component<Props> {
 										</tr>
 									</tbody>
 								</table></div>
-								<div>optional join condition; if no join condition is given it acts as a natural full outer join
+								
+								<div>
 									<div className="too-wide">
-											 {/*
 										<RailroadDiagram 
 											diagram={Diagram(
-													Stack(
-															Sequence(
-																	NonTerminal('RA-expression', '#relalg-relalgexpr'),
-																	Sequence(
-																			Choice(0, '⟗', Sequence('full', 'outer', 'join')),
-																			Optional(NonTerminal('boolean-expression', '#relalg-valueexpr')),
-																	),
-															),
-															NonTerminal('RA-expression', '#relalg-relalgexpr'),
+												Sequence(
+													NonTerminal('RA-expression', '#relalg-relalgexpr'),
+													Sequence(
+														Choice(0, '⟗', Sequence('full', 'outer', 'join')),
+														Optional(NonTerminal('boolean-expression', '#relalg-valueexpr')),
 													),
-											)} />
-											 */}
+												),
+												NonTerminal('RA-expression', '#relalg-relalgexpr'),
+											)} 
+										/>
+									</div>
+
+									<div className="alert alert-info">
+										The join condition is optional: if no join condition is given it acts as a natural full outer join.
 									</div>
 								</div>
 							</div>
+
+							<hr />
+							
+							<div>
+								<h4 id="relalg-operations-leftjoin">left outer join</h4>
+								<div className="scroll-x"><table className="table table-nonfluid">
+									<tbody>
+										<tr>
+											<th>symbol</th>
+											<td className="math">⟕</td>
+										</tr>
+										<tr>
+											<th>alternative syntax</th>
+											<td>left outer join<br />left join</td>
+										</tr>
+									</tbody>
+								</table></div>
+
+								<div> 
+									<div className="too-wide">
+										<RailroadDiagram 
+											diagram={Diagram(
+												Sequence(
+													NonTerminal('RA-expression', '#relalg-relalgexpr'),
+													Sequence(
+														Choice(0, '⟕', Sequence('left', Optional('outer'), 'join')),
+														Optional(NonTerminal('boolean-expression', '#relalg-valueexpr')),
+													),
+												),
+												NonTerminal('RA-expression', '#relalg-relalgexpr'),
+											)}
+										/>
+									</div>
+
+									<div className="alert alert-info">
+										The join condition is optional: if no join condition is given it acts as a natural left outer join.
+									</div>
+								</div>
+							</div>
+
+							<hr />
+
+							<div>
+								<h4 id="relalg-operations-rightjoin">right outer join</h4>
+								<div className="scroll-x"><table className="table table-nonfluid">
+									<tbody>
+										<tr>
+											<th>symbol</th>
+											<td className="math">⟖</td>
+										</tr>
+										<tr>
+											<th>alternative syntax</th>
+											<td>right outer join<br />right join</td>
+										</tr>
+									</tbody>
+								</table></div>
+
+								<div>
+									<div className="too-wide">
+										<RailroadDiagram 
+											diagram={Diagram(
+												Sequence(
+													NonTerminal('RA-expression', '#relalg-relalgexpr'),
+													Sequence(
+														Choice(0, '⟖', Sequence('right', Optional('outer'), 'join')),
+														Optional(NonTerminal('boolean-expression', '#relalg-valueexpr')),
+													),
+												),
+												NonTerminal('RA-expression', '#relalg-relalgexpr'),
+											)} 
+										/>
+									</div>
+
+									<div className="alert alert-info">
+										The join condition is optional: if no join condition is given it acts as a natural right outer join.
+									</div>
+								</div>
+							</div>
+
+							<hr />
+
 							<div>
 								<h4 id="relalg-operations-leftsemijoin">left semi join</h4>
 								<div className="scroll-x"><table className="table table-nonfluid">
@@ -1781,21 +1861,24 @@ export class Help extends React.Component<Props> {
 										</tr>
 									</tbody>
 								</table></div>
-								<div>no argument
+
+								<div>
 									<div className="too-wide">
-										 {/*
 										<RailroadDiagram 
-											diagram={
-											Diagram(
-													NonTerminal('RA-expression', '#relalg-relalgexpr'),
-													Sequence(
-															Choice(0, '⋉', Sequence('left', 'semi', 'join')),
-													),
-													NonTerminal('RA-expression', '#relalg-relalgexpr'),
-											)} />
-											 */}
+											diagram={Diagram(
+												NonTerminal('RA-expression', '#relalg-relalgexpr'),
+												Sequence(
+													Choice(0, '⋉', Sequence('left', 'semi', 'join')),
+												),
+												NonTerminal('RA-expression', '#relalg-relalgexpr'),
+											)} 
+										/>
+									</div>
 								</div>
 							</div>
+
+							<hr />
+
 							<div>
 								<h4 id="relalg-operations-rightsemijoin">right semi join</h4>
 								<div className="scroll-x"><table className="table table-nonfluid">
@@ -1810,21 +1893,24 @@ export class Help extends React.Component<Props> {
 										</tr>
 									</tbody>
 								</table></div>
-								<div>no argument
+								
+								<div>
 									<div className="too-wide">
-										 {/*
 										<RailroadDiagram 
 											diagram={Diagram(
-													NonTerminal('RA-expression', '#relalg-relalgexpr'),
-													Sequence(
-															Choice(0, '⋊', Sequence('right', 'semi', 'join')),
-													),
-													NonTerminal('RA-expression', '#relalg-relalgexpr'),
-											)} />
-											 */}
+												NonTerminal('RA-expression', '#relalg-relalgexpr'),
+												Sequence(
+														Choice(0, '⋊', Sequence('right', 'semi', 'join')),
+												),
+												NonTerminal('RA-expression', '#relalg-relalgexpr'),
+											)} 
+										/>
 									</div>
 								</div>
 							</div>
+
+							<hr />
+
 							<div>
 								<h4 id="relalg-operations-antijoin">anti semi join</h4>
 								<div className="scroll-x"><table className="table table-nonfluid">
@@ -1839,27 +1925,25 @@ export class Help extends React.Component<Props> {
 										</tr>
 									</tbody>
 								</table></div>
-								<div>no argument
-									<br />
 
+								<div>
 									<div className="too-wide">
-										{/*
 										<RailroadDiagram 
 											diagram={Diagram(
-													Stack(
-															Sequence(
-																	NonTerminal('RA-expression', '#relalg-relalgexpr'),
-																	Sequence(
-																			Choice(0, '▷', Sequence('anti', Optional('semi'), 'join')),
-																	),
-															),
-															NonTerminal('RA-expression', '#relalg-relalgexpr'),
+												Sequence(
+													NonTerminal('RA-expression', '#relalg-relalgexpr'),
+													Sequence(
+														Choice(0, '▷', Sequence('anti', Optional('semi'), 'join')),
 													),
-											)} />
-																	*/}
+												),
+												NonTerminal('RA-expression', '#relalg-relalgexpr'),
+											)} 
+										/>
 									</div>
 								</div>
 							</div>
+
+							<hr />
 
 							<h3 id="relalg-operator-precedence">Operator precedence</h3>
 
@@ -1940,7 +2024,8 @@ export class Help extends React.Component<Props> {
 								<br />because the unary operators have a higher precedence than the binary operators.
 							</div>
 
-
+							<hr />
+							
 							<h3 id="relalg-misc">Misc</h3>
 
 							<h4 id="relalg-column">Column</h4>
@@ -3126,7 +3211,6 @@ export class Help extends React.Component<Props> {
 							</p>
 						</div>
 					</div>
-				</div>
 				</div>
 		);
 	}
