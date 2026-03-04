@@ -288,7 +288,7 @@ CodeMirror.defineMode('bagalg', function () {
 		'inner join', 'natural join', 'left join', 'right join', 'left outer join', 'right outer join',
 		'left semi join', 'right semi join', 'anti join', 'anti semi join', 'and', 'or', 'xor',
 	];
-	const keywordsMath = ['∂', 'π', 'σ', 'ρ', 'τ', '←', '→', '∩', '∪', '÷', '-', '⨯', '⨝', '⟕', '⟖', '⟗', '⋉', '⋊', '▷', 'γ'];
+	const keywordsMath = ['∆', 'π', 'σ', 'ρ', 'τ', '←', '→', '∩', '∪', '÷', '-', '⨯', '⨝', '⟕', '⟖', '⟗', '⋉', '⋊', '▷', 'γ'];
 	const operators = ['<-', '->', '>=', '<=', '=', '∧', '∨', '⊻', '⊕', '≠', '=', '¬', '>', '<', '≥', '≤'];
 	const matchAny = (
 		stream: CodeMirror.StringStream,
@@ -544,7 +544,10 @@ type State = {
 	execResult: JSX.Element | null,
 	verifyExecResult: TableRA.Table | null,
 	verifyReferenceExecResult: TableRA.Table | null,
+	verifyReferenceAST: RANode | null,
 	showHint: boolean,
+	showTheory: boolean,
+	showReference: boolean,
 	relationEditorName: string,
 	replSelStart: any,
 	replSelEnd: any,
@@ -714,6 +717,7 @@ export class EditorBase extends React.Component<Props, State> {
 
 	uploadCSVRef: React.RefObject<HTMLInputElement>;
 	hotTableSettings: any;
+	verifySuccessfulListener: any;
 
 	constructor(props: Props) {
 		super(props);
@@ -806,7 +810,10 @@ export class EditorBase extends React.Component<Props, State> {
 			execResult: null,
 			verifyExecResult: null,
 			verifyReferenceExecResult: null,
+			verifyReferenceAST: null,
 			showHint: false,
+			showTheory: false,
+			showReference: false,
 			modal: false,
 			inlineRelationModal: false,
 			relationEditorName: '',
@@ -980,10 +987,35 @@ export class EditorBase extends React.Component<Props, State> {
 		editor.on('change', (cm: CodeMirror.Editor) => {
 			this.props.textChange(cm);
 		});
-	
 
+		// Add listener for verify successful event
+		this.verifySuccessfulListener = () => {
+			this.setState({ verifySuccessful: true });
+		};
+		document.addEventListener(eventVerifySuccessfulName, this.verifySuccessfulListener);
+	}
+
+	componentWillUnmount() {
+		// Remove listener for verify successful event
+		if (this.verifySuccessfulListener) {
+			document.removeEventListener(eventVerifySuccessfulName, this.verifySuccessfulListener);
+		}
 	}
 	
+	private getHelpIds(items: {name: string, helpId: string}[]): string[] {
+		let helpIds: string[] = [];
+
+		for(const item of items) {
+			if(item.helpId !== 'tutorial-user') {
+				if(!helpIds.includes(item.helpId)) {
+					helpIds.push(item.helpId);
+				}
+			}
+		}
+		
+		return helpIds;
+	}
+
 	render() {
 		const {
 			execErrors,
@@ -998,7 +1030,10 @@ export class EditorBase extends React.Component<Props, State> {
 			verifyResult,
 			verifyExecResult,
 			verifyReferenceExecResult,
-			showHint
+			verifyReferenceAST,
+			showHint,
+			showTheory,
+			showReference
 		} = this.state;
 
 		const {
@@ -1150,6 +1185,7 @@ export class EditorBase extends React.Component<Props, State> {
 									<span className="showOnSM">Exec</span>
 								</NavLink>
 							</NavItem>
+
 							{exerciseMode ? 
 								<NavItem>
 									<NavLink
@@ -1165,45 +1201,97 @@ export class EditorBase extends React.Component<Props, State> {
 
 						<TabContent activeTab={this.state.activeTab} className="tab-content-border">
 							<TabPane tabId="exec">
-								{execResult}
+								{execResult ? execResult : 'Execute a query by clicking on "Execute Query" to see the result here!'}
 							</TabPane>
+
 							{exerciseMode ? 
 								<TabPane tabId="verify">
-									<div>{verifyResult}</div>
+									{verifySuccessful ? (<div>
+										<div>{verifyResult}</div>
+										
+										{verifyExecResult && verifyReferenceExecResult ? // show hints if the answer is wrong
+											(<div>
+												<button // show the resulting relation of the user query and the reference query
+													type="button"
+													className={classnames('btn btn-secondary verify-button')}
+													onClick={() => { this.setState({ showHint: !showHint }); }}
+												> 
+													{showHint ? 'Hide' : 'Show'} expected resulting relation 
+												</button>
 
-									<button 
-										type="button"
-										className={classnames('btn btn-secondary verify-button')}
-										onClick={() => { this.setState({ showHint: true }); }}
-									> 
-										Show expected resulting relation 
-									</button>
+												{showHint ? 
+													(<div>
+														<div className="ra-result clearfix result result-table">
+															<div>The relation resulting from your query:</div>
+															<PagedTable
+																className="table table-condensed"
+																maxLinesPerPage={10}
+																table={verifyExecResult}
+																showPagination={true}
+															/>
+														</div>
+														<div className="ra-result clearfix result result-table">
+															<div>The relation resulting from the reference query:</div>
+															<PagedTable
+																className="table table-condensed"
+																maxLinesPerPage={10}
+																table={verifyReferenceExecResult}
+																showPagination={true}
+															/>
+														</div>
+													</div>)
+												: null}
+											
+												<div> 
+													<button // show the theory items related to the reference solution
+														type="button"
+														className={classnames('btn btn-secondary verify-button')}
+														onClick={() => { this.setState({ showTheory: !showTheory }); }}
+													> 
+														{showTheory ? 'Hide' : 'Show'} the theory items that are revelant to the exercise reference solution
+													</button>
 
-									{showHint && verifyExecResult && verifyReferenceExecResult
-										? (
-											<div>
-												<div className="ra-result clearfix result result-table">
-													<div>The relation resulting from your query:</div>
-													<PagedTable
-														className="table table-condensed"
-														maxLinesPerPage={10}
-														table={verifyExecResult}
-														showPagination={true}
-													/>
+													{showTheory && verifyReferenceAST ?
+														(<ul>
+															{this.getHelpIds(verifyReferenceAST.getHelpId()).map((helpId) => (
+																<li key={helpId}>
+																	<a href={'/relax-modified/help#' + helpId} target="_blank" rel="noopener noreferrer">{helpId.split('-').slice(2).join(' ')}</a>
+																</li>
+															))}
+														</ul>) 
+													: null}
 												</div>
-												<div className="ra-result clearfix result result-table">
-													<div>The relation resulting from the reference query:</div>
-													<PagedTable
-														className="table table-condensed"
-														maxLinesPerPage={10}
-														table={verifyReferenceExecResult}
-														showPagination={true}
-													/>
-												</div>
-											</div>
-										)
-										: null
-									}
+											</div>)
+										: null}
+
+										<div>
+											<button // show the reference query
+												type="button"
+												className={classnames('btn btn-secondary verify-button')}
+												onClick={() => { this.setState({ showReference: !showReference }); }}
+											> 
+												{showReference ? 'Hide' : 'Show'} the exercise reference query
+											</button>
+
+											{showReference && this.props.exerciseReference ? 
+												(<div>
+													<div>{ this.props.exerciseReference.reference }</div>
+													<button // replace the user query with the reference query
+														type="button"
+														className={classnames('btn btn-secondary')}
+														onClick={() => { 
+															const exercise = this.props.exerciseReference;
+															if (exercise) {
+																this.replaceAll(exercise.reference);
+															}
+														}}
+													> 
+														Replace the current query with the reference query
+													</button>
+												</div>)
+											: null}
+										</div>
+									</div>) : 'Solve the exercise and click on "Verify Query" to see if your solution is correct!'}
 								</TabPane>
 							: ''}
 						</TabContent>
@@ -1858,6 +1946,7 @@ export class EditorBase extends React.Component<Props, State> {
 				
 			verifyExecResult: null,
 			verifyReferenceExecResult: null,
+			verifyReferenceAST: null,
 			showHint: false,
 		}, () => { // async to allow spinner to render
 			this.clearExecutionAlerts();
@@ -1894,6 +1983,8 @@ export class EditorBase extends React.Component<Props, State> {
 				// execute the teacher query
 				const referenceResult = this.props.execFunction(this, referenceQuery, {line: 0, ch: 0}).result;
 				
+				this.setState({ verifyReferenceAST: referenceResult.props.root }); // to latter show link to the needed theory if the ASTs are different
+
 				if(execResult.props.root.equals(referenceResult.props.root)) { // equivalent syntax tree 
 					this.setState({ verifyResult: "Solution accepted : ASTs are identical." });
 					
@@ -1996,7 +2087,7 @@ export class EditorBase extends React.Component<Props, State> {
 			}
 		});
 	}
-
+	
 	// region Translated PegJs Message
 
 	/* this is a modified version of the original pegjs function
