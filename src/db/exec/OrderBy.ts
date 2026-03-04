@@ -24,7 +24,7 @@ export class OrderBy extends RANodeUnary {
 	_orderIndices: number[] | null;
 
 	constructor(child: RANode, orderCols: Column[], orderAsc: boolean[]) {
-		super('&tau;', child);
+		super('&tau;', 'relalg-operations-orderby', child);
 
 		this._orderCols = orderCols;
 		this._orderAsc = orderAsc;

@@ -53,6 +53,7 @@ export abstract class Join extends RANodeBinary {
 		child: RANode,
 		child2: RANode,
 		functionName: string,
+		helpId: string,
 		/** condition is either a ValueExpr evaluating to boolean
 		 * or an Array of unqualified column names as strings for the using clause or
 		 * null for a natural join 
@@ -61,7 +62,7 @@ export abstract class Join extends RANodeBinary {
 		isRightJoin: boolean,
 		isAntiJoin = false,
 	) {
-		super(functionName, child, child2);
+		super(functionName, helpId, child, child2);
 		this._isAntiJoin = isAntiJoin;
 		this._isRightJoin = isRightJoin;
 		this._joinConditionOptions = joinCondition;

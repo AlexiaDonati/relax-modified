@@ -21,7 +21,7 @@ export class Difference extends RANodeBinary {
 		/** the right child expression */
 		child2: RANode,
 	) {
-		super('-', child, child2);
+		super('-', 'relalg-operations-subtraction', child, child2);
 	}
 
 	getSchema() {

@@ -47,7 +47,7 @@ export class GroupBy extends RANodeUnary {
 	} | null = null;
 
 	constructor(child: RANode, groupByCols: GroupByCol[], aggregateFunctions: AggregateFunction[]) {
-		super('&gamma;', child);
+		super('&gamma;', 'relalg-operations-groupby', child);
 
 		this.groupByCols = groupByCols;
 		this.aggregateFunctions = aggregateFunctions;

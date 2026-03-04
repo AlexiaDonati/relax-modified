@@ -286,12 +286,17 @@ example,  42
 							<span>Select Exercise { exercise? "( " + exercise.name + " )" : ""}</span>
 							<span className="caret" style={{ display: 'block', position: 'absolute', top: '50%', right: '10px' }}></span>
 						</button>
+
 						{exerciseMode && exercise !== undefined ?
 							<div>
 								<div>Exercise: {exercise.name}</div>
 								<div>Description: {exercise.description}</div>
 							</div>
 						: ''}
+
+						<div style={{ marginTop: '10px' }}>
+							<a href="/relax-modified/help#relalg-reference"> <FontAwesomeIcon icon={faQuestionCircle as IconProp} /> Theory </a>
+						</div>
 					</div>
 				</div>
 

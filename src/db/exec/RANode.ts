@@ -51,9 +51,11 @@ export abstract class RANode {
 	_wrappedInParentheses: boolean = false;
 	_warnings: Warning[] = [];
 	_execTime: any;
+	_helpId: string;
 	
-	constructor(functionName = '') {
+	constructor(functionName = '', helpId = 'tutorial-user') {
 		this._functionName = functionName;
+		this._helpId = helpId;
 	}
 
 	setCodeInfoObject(codeInfo: CodeInfo | null) {
@@ -177,6 +179,8 @@ export abstract class RANode {
 	 * @param node the node to compare with
 	 */
 	abstract equals(node: RANode): boolean; 
+
+	abstract getHelpId(): {name: string, helpId: string}[];
 }
 
 export abstract class RANodeNullary extends RANode {
@@ -203,13 +207,17 @@ export abstract class RANodeNullary extends RANode {
 			return false;
 		}
 	}
+
+	getHelpId(): {name: string, helpId: string}[] {
+		return [{name: this._functionName, helpId: this._helpId}];
+	}
 }
 
 export abstract class RANodeUnary extends RANode {
 	protected _child: RANode;
 
-	constructor(functionName: string, child: RANode) {
-		super(functionName);
+	constructor(functionName: string, helpId: string, child: RANode) {
+		super(functionName, helpId);
 		this._child = child;
 	}
 
@@ -239,14 +247,18 @@ export abstract class RANodeUnary extends RANode {
 			${wrap ? ')' : ''}`
 		);
 	}
+
+	getHelpId(): {name: string, helpId: string}[] {
+		return [{name: this._functionName, helpId: this._helpId}, ...this.getChild().getHelpId()];
+	}
 }
 
 export abstract class RANodeBinary extends RANode {
 	protected _child: RANode;
 	protected _child2: RANode;
 
-	constructor(functionName: string, child: RANode, child2: RANode) {
-		super(functionName);
+	constructor(functionName: string, helpId: string, child: RANode, child2: RANode) {
+		super(functionName, helpId);
 		this._child = child;
 		this._child2 = child2;
 	}
@@ -301,5 +313,13 @@ export abstract class RANodeBinary extends RANode {
 		else {
 			return false;
 		}
+	}
+
+	getHelpId(): {name: string, helpId: string}[] {
+		return [
+			{name: this._functionName, helpId: this._helpId},
+			...this.getChild().getHelpId(),
+			...this.getChild2().getHelpId()
+		];
 	}
 }

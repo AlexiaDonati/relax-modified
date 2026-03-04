@@ -20,7 +20,7 @@ export class Union extends RANodeBinary {
 	private _schema: Schema | null = null;
 
 	constructor(child: RANode, child2: RANode) {
-		super('∪', child, child2);
+		super('∪', 'relalg-operations-union', child, child2);
 
 		this._schema = null; // is set by check
 	}

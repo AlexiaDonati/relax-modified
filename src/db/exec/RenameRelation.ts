@@ -21,7 +21,7 @@ export class RenameRelation extends RANodeUnary {
 	_schema: Schema | null = null;
 
 	constructor(child: RANode, newRelAlias: string) {
-		super('&rho;', child);
+		super('&rho;', 'relalg-operations-renamerelation', child);
 
 		this._newRelAlias = newRelAlias;
 	}
