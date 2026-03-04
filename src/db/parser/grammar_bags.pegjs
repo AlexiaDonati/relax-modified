@@ -188,10 +188,10 @@ _sl // single line optional whitespace
 	{ return ''; }
 
 string 'string'
-= '\'' a:$[^'\\n]* '\''
+= '\'' a:$[^'\n]* '\''
 	{ return a; }
 /
-	'"' a:$([^"\\n]*) '"'
+	'"' a:$[^"\n]* '"'
 	{ return a; }
 
 integer
@@ -281,7 +281,7 @@ columnName
 
 // operator names:
 delta
-= _ o:('∂' { return getNodeInfo('delta'); }) _
+= _ o:('∆' { return getNodeInfo('delta'); }) _
 	{ return o; }
 / _ o:('delta'i { return getNodeInfo('delta'); }) __
 	{ return o; }

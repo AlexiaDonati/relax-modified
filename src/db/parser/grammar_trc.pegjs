@@ -309,10 +309,10 @@ _nc 'optional whitespace without comments'
 = [\r\n\t ]*
 
 string 'string'
-= '\'' a:$[^'\\n]* '\''
+= '\'' a:$[^'\n]* '\''
 	{ return a; }
 /
-	'"' a:$([^"\\n]*) '"'
+	'"' a:$[^"\n]* '"'
 	{ return a; }
 
 integer
