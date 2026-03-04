@@ -72,7 +72,9 @@ export class EditorGroup extends React.Component<Props> {
 						this.editorBase = ref;
 					}
 				}}
+
 				mode="relalg"
+				
 				disableHistory={true}
 				execButtonLabel="calc.editors.group.button-exec"
 				execFunction={(self: EditorBase, text: string, offset) => {

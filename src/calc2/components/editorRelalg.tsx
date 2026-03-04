@@ -52,6 +52,42 @@ export class EditorRelalg extends React.Component<Props, State> {
 		this.replaceText = this.replaceText.bind(this);
 	}
 
+	prepareAST(self: EditorBase, text: string, relations: { [name: string]: Relation }) {
+		const ast = parseRelalg(text, Object.keys(relations));
+		replaceVariables(ast, relations);
+
+		if (ast.child === null) {
+			if (ast.assignments.length > 0) {
+				throw new Error(t('calc.messages.error-query-missing-assignments-found'));
+			}
+			else {
+				throw new Error(t('calc.messages.error-query-missing'));
+			}
+		}
+
+		const root = relalgFromRelalgAstRoot(ast, relations);
+		root.check();
+
+
+		self.historyAddEntry(text);
+
+		if (self.props.enableInlineRelationEditor) {
+			self.addInlineRelationMarkers(ast);
+		}
+		
+		return {
+			result: (
+				<Result
+					editorRef={this.editorBase!}
+					root={root}
+					numTreeLabelColors={NUM_TREE_LABEL_COLORS}
+					execTime={self.state.execTime == null ? 0 : self.state.execTime}
+					doEliminateDuplicates={true}
+				/>
+			),
+		};
+	}
+	
 	// region Render
 
 	render() {
@@ -82,47 +118,10 @@ export class EditorRelalg extends React.Component<Props, State> {
 				mode="relalg"
 
 				execFunction={(self: EditorBase, text: string, offset) => {
-					const ast = parseRelalg(text, Object.keys(relations));
-					replaceVariables(ast, relations);
-
-					if (ast.child === null) {
-						if (ast.assignments.length > 0) {
-							throw new Error(t('calc.messages.error-query-missing-assignments-found'));
-						}
-						else {
-							throw new Error(t('calc.messages.error-query-missing'));
-						}
-					}
-
-					const root = relalgFromRelalgAstRoot(ast, relations);
-					root.check();
-
-
-					self.historyAddEntry(text);
-
-					if (self.props.enableInlineRelationEditor) {
-						self.addInlineRelationMarkers(ast);
-					}
-
-					// calc.displayRaResult(root);
-					return {
-						result: (
-							<Result
-								editorRef={this.editorBase!}
-								root={root}
-								numTreeLabelColors={NUM_TREE_LABEL_COLORS}
-								execTime={self.state.execTime == null ? 0 : self.state.execTime}
-								doEliminateDuplicates={true}
-							/>
-						),
-					};
+					return this.prepareAST(self, text, relations);
 				}}
 				
 				execTestsFunction={(self: EditorBase, text: string, offset: any, exerciseGroup: boolean, exerciseGroupIndex: number) => {
-					/*if randomData {
-						// TODO: Alexia add random variation of the data for the reference group schema
-					}*/
-
 					let testRelations: { [name: string]: Relation } = {};
 
 					if(exerciseGroup && this.props.exercise){
@@ -139,40 +138,7 @@ export class EditorRelalg extends React.Component<Props, State> {
 						}
 					}
 
-					// TODO: move share code to another function
-					const ast = parseRelalg(text, Object.keys(testRelations));
-					replaceVariables(ast, testRelations);
-
-					if (ast.child === null) {
-						if (ast.assignments.length > 0) {
-							throw new Error(t('calc.messages.error-query-missing-assignments-found'));
-						}
-						else {
-							throw new Error(t('calc.messages.error-query-missing'));
-						}
-					}
-
-					const root = relalgFromRelalgAstRoot(ast, testRelations);
-					root.check();
-
-
-					self.historyAddEntry(text);
-
-					if (self.props.enableInlineRelationEditor) {
-						self.addInlineRelationMarkers(ast);
-					}
-
-					return {
-						result: (
-							<Result
-								editorRef={this.editorBase!}
-								root={root}
-								numTreeLabelColors={NUM_TREE_LABEL_COLORS}
-								execTime={self.state.execTime == null ? 0 : self.state.execTime}
-								doEliminateDuplicates={true}
-							/>
-						),
-					};
+					return this.prepareAST(self, text, testRelations);
 				}}
 				
 				tab="relalg"
