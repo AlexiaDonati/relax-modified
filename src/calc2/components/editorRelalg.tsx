@@ -325,37 +325,6 @@ export class EditorRelalg extends React.Component<Props, State> {
 						math: true,
 						items: [
 							{
-								label: 'τ',
-								onClick: this.replaceText,
-								tooltipTitle: 'calc.editors.ra.toolbar.orderBy',
-								tooltip: 'calc.editors.ra.toolbar.orderBy-content',
-							},
-							{
-								label: 'γ',
-								onClick: this.replaceText,
-								tooltipTitle: 'calc.editors.ra.toolbar.groupBy',
-								tooltip: 'calc.editors.ra.toolbar.groupBy-content',
-							},
-							
-							{
-								label: '⟕',
-								onClick: this.replaceText,
-								tooltipTitle: 'calc.editors.ra.toolbar.left-outer-join',
-								tooltip: 'calc.editors.ra.toolbar.left-outer-join-content',
-							},
-							{
-								label: '⟖',
-								onClick: this.replaceText,
-								tooltipTitle: 'calc.editors.ra.toolbar.right-outer-join',
-								tooltip: 'calc.editors.ra.toolbar.right-outer-join-content',
-							},
-							{
-								label: '⟗',
-								onClick: this.replaceText,
-								tooltipTitle: 'calc.editors.ra.toolbar.full-outer-join',
-								tooltip: 'calc.editors.ra.toolbar.full-outer-join-content',
-							},
-							{
 								label: '⋉',
 								onClick: this.replaceText,
 								tooltipTitle: 'calc.editors.ra.toolbar.left-semi-join',
@@ -378,27 +347,13 @@ export class EditorRelalg extends React.Component<Props, State> {
 
 					{ items: [{ type: 'separator' }] },
 
-					{ // assignment
-						math: true,
-						items: [
-							{
-								label: '=',
-								onClick: item => this.replaceText(item, '= '),
-								tooltipTitle: 'calc.editors.ra.toolbar.assignment',
-								tooltip: 'calc.editors.ra.toolbar.assignment-content',
-							},
-						],
-					},
-
-					{ items: [{ type: 'separator' }] },
-
 					{ // misc
 						math: true,
 						items: [
 							
 							{
 								label: '{}',
-								onClick: item => this.replaceText(item, '{a:string, b:number, X.c:date\n\ta, 1, 1970-01-01\n}'),
+								onClick: item => this.replaceText(item, '{a:string, b:number\n\ta, 1\n}'),
 								tooltipTitle: 'calc.editors.ra.toolbar.inline-relation',
 								tooltip: 'calc.editors.ra.toolbar.inline-relation-content',
 							},
