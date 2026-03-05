@@ -233,14 +233,14 @@ testQueryOperator
 = _ '-' _
 
 relationName 'relationName'
-= !(RESERVED_KEYWORD !([0-9a-zA-Z_]+)) a:$([a-zA-Z]+ $[0-9a-zA-Z_]*)
+= !(RESERVED_KEYWORD !([0-9A-Za-zÀ-ÖØ-öø-ÿ_]+)) a:$([A-Za-zÀ-ÖØ-öø-ÿ]+ $[0-9A-Za-zÀ-ÖØ-öø-ÿ_]*)
 	{
 		return a;
 	}
 
 
 unqualifiedColumnName
-= !(RESERVED_KEYWORD !([0-9a-zA-Z_]+)) a:$([a-zA-Z]+ $[0-9a-zA-Z_]*)
+= !(RESERVED_KEYWORD !([0-9A-Za-zÀ-ÖØ-öø-ÿ_]+)) a:$([A-Za-zÀ-ÖØ-öø-ÿ]+ $[0-9A-Za-zÀ-ÖØ-öø-ÿ_]*)
 	{
 		return a;
 	}
@@ -731,14 +731,14 @@ isoLanguageCode
 
 
 exampleSql
- = a:('exampleSql' + ' - {') query:$[0-9 * a-z A-Z ( ) \n = . , ; - / \t]+ '}'
+= a:('exampleSql' + ' - {') query:$[0-9 * A-Z a-z À-Ö Ø-ö ø-ÿ ( ) \n = . , ; - / \t]+ '}'
 {
 	return query;
 }  
 
 
 exampleQueryRelAlg
- = ('exampleRelAlg' + ' - {') query:$[0-9 * a-z A-Z ( ) \n = . , ; - / \t]+ '}'
+= ('exampleRelAlg' + ' - {') query:$[0-9 * A-Z a-z À-Ö Ø-ö ø-ÿ ( ) \n = . , ; - / \t]+ '}'
 {
 	return query;
 }  
