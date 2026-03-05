@@ -717,6 +717,8 @@ export class EditorBase extends React.Component<Props, State> {
 
 	uploadCSVRef: React.RefObject<HTMLInputElement>;
 	hotTableSettings: any;
+
+	execSuccessfulListener: any;
 	verifySuccessfulListener: any;
 
 	constructor(props: Props) {
@@ -988,6 +990,12 @@ export class EditorBase extends React.Component<Props, State> {
 			this.props.textChange(cm);
 		});
 
+		// Add listener for exec successful event
+		this.execSuccessfulListener = () => {
+			this.setState({ execSuccessful: true });
+		}
+		document.addEventListener(eventExecSuccessfulName, this.execSuccessfulListener);
+
 		// Add listener for verify successful event
 		this.verifySuccessfulListener = () => {
 			this.setState({ verifySuccessful: true });
@@ -996,6 +1004,11 @@ export class EditorBase extends React.Component<Props, State> {
 	}
 
 	componentWillUnmount() {
+		// Remove listener for exec successful event
+		if (this.execSuccessfulListener) {
+			document.removeEventListener(eventExecSuccessfulName, this.execSuccessfulListener);
+		}
+		
 		// Remove listener for verify successful event
 		if (this.verifySuccessfulListener) {
 			document.removeEventListener(eventVerifySuccessfulName, this.verifySuccessfulListener);
@@ -1201,7 +1214,7 @@ export class EditorBase extends React.Component<Props, State> {
 
 						<TabContent activeTab={this.state.activeTab} className="tab-content-border">
 							<TabPane tabId="exec">
-								{execResult ? execResult : 'Execute a query by clicking on "Execute Query" to see the result here!'}
+								{execSuccessful && execResult ? execResult : 'Execute a query by clicking on "Execute Query" to see the result here!'}
 							</TabPane>
 
 							{exerciseMode ? 
@@ -1344,6 +1357,7 @@ export class EditorBase extends React.Component<Props, State> {
 			inlineRelationModal: !this.state.inlineRelationModal,
 		});
 	}
+
 	toggle() {
 		if (!this.isMobile()) {
 			return;
@@ -1947,7 +1961,10 @@ export class EditorBase extends React.Component<Props, State> {
 			verifyExecResult: null,
 			verifyReferenceExecResult: null,
 			verifyReferenceAST: null,
+			
 			showHint: false,
+			showTheory: false,
+			showReference: false,
 		}, () => { // async to allow spinner to render
 			this.clearExecutionAlerts();
 
@@ -1969,7 +1986,6 @@ export class EditorBase extends React.Component<Props, State> {
 				this.setState({ verifyResult: "Solution accepted : Queries string are identical." });
 
 				document.dispatchEvent(event);
-				this.toggle();
 				return true;
 			}
 			// else: continue with AST and result comparison
@@ -1989,7 +2005,6 @@ export class EditorBase extends React.Component<Props, State> {
 					this.setState({ verifyResult: "Solution accepted : ASTs are identical." });
 					
 					document.dispatchEvent(event);
-					this.toggle();
 					return true;
 				}
 				// else: continue with result comparison
@@ -2027,7 +2042,6 @@ export class EditorBase extends React.Component<Props, State> {
 					});
 
 					document.dispatchEvent(event);
-					this.toggle();
 					return false;
 				}
 				// else: continue to perform tests since results may match by coincidence
@@ -2061,7 +2075,6 @@ export class EditorBase extends React.Component<Props, State> {
 							});
 
 							document.dispatchEvent(event);
-							this.toggle();
 							return false;
 						}
 					}
@@ -2072,9 +2085,7 @@ export class EditorBase extends React.Component<Props, State> {
 				
 				// if all tests passed
 				this.setState({ verifyResult: "Solution accepted : Passed all tests in place." });
-
 				document.dispatchEvent(event);
-				this.toggle();
 				return true;
 			}
 			catch (e) {
