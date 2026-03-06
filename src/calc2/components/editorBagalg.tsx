@@ -200,31 +200,29 @@ export class EditorBagalg extends React.Component<Props, State> {
 								tooltip: 'calc.editors.ra.toolbar.projection-content',
 							},
 							{
-								label: 'σ',
-								onClick: this.replaceText,
-								tooltipTitle: 'calc.editors.ra.toolbar.selection',
-								tooltip: 'calc.editors.ra.toolbar.selection-content',
-							},
-							{
-								label: 'ρ',
-								onClick: this.replaceText,
-								tooltipTitle: 'calc.editors.ra.toolbar.rename',
-								tooltip: 'calc.editors.ra.toolbar.rename-content',
-							},
-							{
 								label: '←',
 								onClick: this.replaceText,
 								tooltipTitle: 'calc.editors.ra.toolbar.rename-columns-operator',
 								tooltip: 'calc.editors.ra.toolbar.rename-columns-operator-content',
 							},
-							/*
 							{
 								label: '→',
 								onClick: this.replaceText,
 								tooltipTitle: 'calc.editors.ra.toolbar.right-arrow',
 								tooltip: 'calc.editors.ra.toolbar.right-arrow-content',
 							},
-							*/
+							{
+								label: 'σ',
+								onClick: this.replaceText,
+								tooltipTitle: 'calc.editors.ra.toolbar.selection',
+								tooltip: 'calc.editors.ra.toolbar.selection-content',
+							},
+							{
+								label: '∆',
+								onClick: this.replaceText,
+								tooltipTitle: 'calc.editors.ra.toolbar.duplicate-elimination',
+								tooltip: 'calc.editors.ra.toolbar.duplicate-elimination-content',
+							},
 							{
 								label: 'τ',
 								onClick: this.replaceText,
@@ -239,6 +237,9 @@ export class EditorBagalg extends React.Component<Props, State> {
 							},
 						],
 					},
+
+					{ items: [{ type: 'separator' }] },
+
 					{
 						math: true,
 						items: [
@@ -287,15 +288,12 @@ export class EditorBagalg extends React.Component<Props, State> {
 							},
 						],
 					},
+
+					{ items: [{ type: 'separator' }] },
+
 					{
 						math: true,
 						items: [
-							{
-								label: '∩',
-								onClick: this.replaceText,
-								tooltipTitle: 'calc.editors.ra.toolbar.intersect',
-								tooltip: 'calc.editors.ra.toolbar.intersect-content',
-							},
 							{
 								label: '∪',
 								onClick: this.replaceText,
@@ -303,22 +301,17 @@ export class EditorBagalg extends React.Component<Props, State> {
 								tooltip: 'calc.editors.ra.toolbar.union-content',
 							},
 							{
-								label: '÷',
-								onClick: this.replaceText,
-								tooltipTitle: 'calc.editors.ra.toolbar.division',
-								tooltip: 'calc.editors.ra.toolbar.division-content',
-							},
-							{
 								label: '-',
 								onClick: this.replaceText,
 								tooltipTitle: 'calc.editors.ra.toolbar.subtraction',
 								tooltip: 'calc.editors.ra.toolbar.subtraction-content',
 							},
-						],
-					},
-					{
-						math: true,
-						items: [
+							{
+								label: '∩',
+								onClick: this.replaceText,
+								tooltipTitle: 'calc.editors.ra.toolbar.intersect',
+								tooltip: 'calc.editors.ra.toolbar.intersect-content',
+							},
 							{
 								label: '⨯',
 								onClick: this.replaceText,
@@ -332,6 +325,26 @@ export class EditorBagalg extends React.Component<Props, State> {
 								tooltip: 'calc.editors.ra.toolbar.natural-join-content',
 							},
 							{
+								label: '÷',
+								onClick: this.replaceText,
+								tooltipTitle: 'calc.editors.ra.toolbar.division',
+								tooltip: 'calc.editors.ra.toolbar.division-content',
+							},
+						],
+					},
+
+					{ items: [{ type: 'separator' }] },
+
+					{
+						math: true,
+						items: [
+							{
+								label: '⟗',
+								onClick: this.replaceText,
+								tooltipTitle: 'calc.editors.ra.toolbar.full-outer-join',
+								tooltip: 'calc.editors.ra.toolbar.full-outer-join-content',
+							},
+							{
 								label: '⟕',
 								onClick: this.replaceText,
 								tooltipTitle: 'calc.editors.ra.toolbar.left-outer-join',
@@ -343,12 +356,7 @@ export class EditorBagalg extends React.Component<Props, State> {
 								tooltipTitle: 'calc.editors.ra.toolbar.right-outer-join',
 								tooltip: 'calc.editors.ra.toolbar.right-outer-join-content',
 							},
-							{
-								label: '⟗',
-								onClick: this.replaceText,
-								tooltipTitle: 'calc.editors.ra.toolbar.full-outer-join',
-								tooltip: 'calc.editors.ra.toolbar.full-outer-join-content',
-							},
+							
 							{
 								label: '⋉',
 								onClick: this.replaceText,
@@ -367,23 +375,14 @@ export class EditorBagalg extends React.Component<Props, State> {
 								tooltipTitle: 'calc.editors.ra.toolbar.anti-join',
 								tooltip: 'calc.editors.ra.toolbar.anti-join-content',
 							},
-							{
-								label: '∆',
-								onClick: this.replaceText,
-								tooltipTitle: 'calc.editors.ra.toolbar.duplicate-elimination',
-								tooltip: 'calc.editors.ra.toolbar.duplicate-elimination-content',
-							},
 						],
 					},
+
+					{ items: [{ type: 'separator' }] },
+
 					{
 						math: true,
 						items: [
-							{
-								label: '=',
-								onClick: item => this.replaceText(item, '= '),
-								tooltipTitle: 'calc.editors.ra.toolbar.assignment',
-								tooltip: 'calc.editors.ra.toolbar.assignment-content',
-							},
 							{
 								label: '--',
 								onClick: item => this.replaceText(item, '-- '),
@@ -404,6 +403,9 @@ export class EditorBagalg extends React.Component<Props, State> {
 							},
 						],
 					},
+
+					{ items: [{ type: 'separator' }] },
+					
 					{
 						items: [
 							{
