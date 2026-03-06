@@ -228,6 +228,7 @@ boolean
 
 assignmentOperator
 = _ '=' _
+/ _ arrowLeft _
 
 testQueryOperator
 = _ '-' _
@@ -577,7 +578,7 @@ listOfOrderByArgs
 
 
 aggFunction
-= func:$('sum'i / 'count'i / 'avg'i / 'min'i / 'max'i) _ '(' _ col:columnName _ ')'
+= func:$('sum'i / 'count'i / 'avg'i / 'min'i / 'max'i) _ '(' _ col:valueExpr _ ')'
 	{
 		return {
 			aggFunction: func.toUpperCase(),
@@ -594,13 +595,13 @@ aggFunction
 
 aggFunctionArgument
 //= func:aggFunction arrowRight name:unqualifiedColumnName
-= name:unqualifiedColumnName arrowRight func:aggFunction
+= name:unqualifiedColumnName arrowLeft func:aggFunction
 	{
 		func.name = name;
 		return func;
 	}
 /// name:unqualifiedColumnName arrowLeft func:aggFunction
-/ func:aggFunction arrowLeft name:unqualifiedColumnName
+/ func:aggFunction arrowRight name:unqualifiedColumnName
 	{
 		func.name = name;
 		return func;
