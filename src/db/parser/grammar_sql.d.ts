@@ -137,7 +137,7 @@ declare namespace sqlAst {
 	interface aggFunction {
 		type: 'aggFunction',
 		aggFunction: 'SUM' | 'COUNT' | 'AVG' | 'MIN' | 'MAX' | 'COUNT_ALL',
-		col: columnName,
+		col: valueExpr | null,
 	}
 
 	interface aggFunctionArgument extends aggFunction {

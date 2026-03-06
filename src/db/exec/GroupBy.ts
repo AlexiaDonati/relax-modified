@@ -9,6 +9,7 @@ import { Column } from './Column';
 import { RANode, RANodeUnary, Session } from './RANode';
 import { DataType, Schema } from './Schema';
 import { Table, Tuple } from './Table';
+import { ValueExpr, ValueExprColumnValue } from './ValueExpr';
 
 
 export interface GroupByCol {
@@ -19,10 +20,7 @@ export interface GroupByCol {
 export interface AggregateFunction {
 	name: string | number,
 	aggFunction: string,
-	col: {
-		name: string | number,
-		relAlias: string | null,
-	}
+	col: ValueExpr | null,
 }
 
 
@@ -42,7 +40,7 @@ export class GroupBy extends RANodeUnary {
 
 	private checked: {
 		schema: Schema,
-		aggregateFunctionsColIndex: number[],
+		aggregateFunctionsExpr: (ValueExpr | null)[],
 		groupByColumnIndices: number[],
 	} | null = null;
 
@@ -65,7 +63,7 @@ export class GroupBy extends RANodeUnary {
 		const childSchema = this._child.getSchema();
 
 		const groupByColumnIndices = new Array<number>(this.groupByCols.length);
-		const aggregateFunctionsColIndex = Array<number>(this.aggregateFunctions.length);
+		const aggregateFunctionsExpr = new Array<ValueExpr | null>(this.aggregateFunctions.length);
 
 		// Get relation aliases
 		const relAliases = this._child.getMetaData('fromVariable');
@@ -154,72 +152,28 @@ export class GroupBy extends RANodeUnary {
 					throw new Error('should not happen; unknown aggregate function');
 			}
 
-			if (f.aggFunction !== 'COUNT_ALL') {
-				let index = -1;
-				const iSchema = vars.indexOf(f.col.relAlias + '');
-
-				if (iSchema >= 0) {
-					let j = 0, k = 0;
-					// Set first relation alias
-					let lastAlias = childSchema.getColumn(j).getRelAlias();
-					// Check if relation alias already found
-					let found = false;
-					for (; j < childSchema.getSize(); j++) {
-						// Check if relation alias changed
-						if (childSchema.getColumn(j).getRelAlias() !== lastAlias) {
-							lastAlias = childSchema.getColumn(j).getRelAlias();
-							if (k < vars.length - 1) k++;
-						}
-	
-						// Check if column name and relation alias match
-						if (childSchema.getColumn(j).getName() === f.col.name &&
-							k === iSchema) {
-
-							// Column name and alias found previously
-							if (found) {
-								throw new Error(i18n.t('db.messages.exec.error-column-ambiguous', {
-									column: Column.printColumn(
-										f.col.name,
-										f.col.relAlias
-									),
-									schema: childSchema,
-								}));
-							}
-
-							// Set index
-							index = j;
-							found = true;
-						}
-					}
-	
-					// Throw error if column not found
-					if (index === -1) {
-						// Column not found
-						try {
-							childSchema.getColumnIndex(
-								f.col.name,
-								f.col.relAlias);
-						}
-						catch (e) {
-							this.throwExecutionError(e.message);
-						}
-					}
-				}
-				else {
-					// default case
-					try {
-						index = childSchema.getColumnIndex(
-							f.col.name,
-							f.col.relAlias
-						);
-					}
-					catch (e) {
-						this.throwExecutionError(e.message);
-					}
-				}
-
-				aggregateFunctionsColIndex[i] = index;
+			if (f.aggFunction === 'COUNT_ALL') {
+				aggregateFunctionsExpr[i] = null;
+				continue;
 			}
+
+			if (!f.col) {
+				throw new Error('should not happen; aggregate function has no argument');
+			}
+
+			let expr: ValueExpr;
+			if (typeof (f.col as any).check === 'function' && typeof (f.col as any).evaluate === 'function') {
+				expr = f.col as ValueExpr;
+			}
+			else {
+				const c = f.col as any;
+				expr = new ValueExprColumnValue(c.name, c.relAlias);
+			}
+
+			// check expression against child schema
+			expr.check(childSchema);
+
+			aggregateFunctionsExpr[i] = expr;
 		}
 
 		// create new Schema
@@ -229,24 +183,34 @@ export class GroupBy extends RANodeUnary {
 		}
 		for (let i = 0; i < this.aggregateFunctions.length; i++) {
 			const func = this.aggregateFunctions[i];
-			const colType = childSchema.getType(aggregateFunctionsColIndex[i]);
 			let type: DataType;
 
 			switch (func.aggFunction) {
 				case 'MIN':
-				case 'MAX':
-					type = colType;
+				case 'MAX': {
+					const expr = aggregateFunctionsExpr[i];
+					if (!expr) {
+						throw new Error('missing expression for aggregate function');
+					}
+					type = expr.getDataType();
 					break;
+				}
 				case 'SUM':
-				case 'AVG':
+				case 'AVG': {
+					const expr = aggregateFunctionsExpr[i];
+					if (!expr) {
+						throw new Error('missing expression for aggregate function');
+					}
+					const colType = expr.getDataType();
 					if (colType !== 'number') {
 						this.throwExecutionError(i18n.t('db.messages.exec.error-func-not-defined-for-column-type', {
 							func: func.aggFunction,
-							colType: colType,
+							colType,
 						}));
 					}
 					type = colType;
 					break;
+				}
 				case 'COUNT_ALL':
 				case 'COUNT':
 					type = 'number';
@@ -258,8 +222,8 @@ export class GroupBy extends RANodeUnary {
 		}
 
 		this.checked = {
-			aggregateFunctionsColIndex,
 			schema,
+			aggregateFunctionsExpr,
 			groupByColumnIndices,
 		};
 	}
@@ -270,11 +234,12 @@ export class GroupBy extends RANodeUnary {
 		});
 
 		const agg = this.aggregateFunctions.map(func => {
-			const s = (
-				func.aggFunction === 'COUNT_ALL'
-					? 'COUNT(*)'
-					: `${func.aggFunction}(${Column.printColumn(func.col.name, func.col.relAlias)})`
-			);
+			const arg = func.aggFunction === 'COUNT_ALL'
+				? '*'
+				: (func.col && typeof (func.col as any).getFormulaHtml === 'function'
+					? (func.col as any).getFormulaHtml()
+					: Column.printColumn((func.col as any)?.name, (func.col as any)?.relAlias));
+			const s = `${func.aggFunction}(${arg})`;
 			return `${s}→${func.name}`;
 		});
 
@@ -370,8 +335,10 @@ export class GroupBy extends RANodeUnary {
 
 
 		// execute aggregate functions
-		let aggValue, group, value;
-		let entry;
+		let aggValue: any;
+		let group: Tuple[];
+		let value: any;
+		let entry: any;
 		for (let h = 0; h < groupsOfRows.length; h++) {
 			if (!groupsOfRows[h]) {
 				continue;
@@ -382,19 +349,18 @@ export class GroupBy extends RANodeUnary {
 
 			for (let i = 0; i < this.aggregateFunctions.length; i++) {
 				const func = this.aggregateFunctions[i];
-				const funcColIndex = this.checked.aggregateFunctionsColIndex[i];
+				const expr = this.checked.aggregateFunctionsExpr[i];
 
 				if (func.aggFunction === 'COUNT_ALL') {
 					aggValue = group.length;
 				}
 				else {
-					// var colType = this._child.getSchema().getType(func.colIndex);
 					switch (func.aggFunction) {
 						case 'COUNT':
 							aggValue = 0;
 
 							for (let j = 0; j < group.length; j++) {
-								value = group[j][funcColIndex];
+								value = expr!.evaluate(group[j], [], j, session);
 								if (value !== null) {
 									aggValue++;
 								}
@@ -408,7 +374,10 @@ export class GroupBy extends RANodeUnary {
 							const c = func.aggFunction === 'MIN' ? genericMin : genericMax;
 
 							for (let j = 0; j < group.length; j++) {
-								value = group[j][funcColIndex];
+								value = expr!.evaluate(group[j], [], j, session);
+								if (value === null) {
+									continue;
+								}
 								if (aggValue === null) {
 									aggValue = value;
 								}
@@ -425,7 +394,7 @@ export class GroupBy extends RANodeUnary {
 							let counter = 0;
 
 							for (let j = 0; j < group.length; j++) {
-								value = group[j][funcColIndex];
+								value = expr!.evaluate(group[j], [], j, session);
 								if (value !== null) {
 									sum += value;
 									counter++;
@@ -483,11 +452,30 @@ export class GroupBy extends RANodeUnary {
 			}
 
 			for(let i = 0; i < this.aggregateFunctions.length; i++) { // for each aggregate function
-				if(this.aggregateFunctions[i].aggFunction !== node.aggregateFunctions[i].aggFunction
-				   || this.aggregateFunctions[i].name !== node.aggregateFunctions[i].name
-				   || this.aggregateFunctions[i].col.name !== node.aggregateFunctions[i].col.name
-				   || this.aggregateFunctions[i].col.relAlias !== node.aggregateFunctions[i].col.relAlias) {
-					return false; // different aggregate functions
+				const a = this.aggregateFunctions[i];
+				const b = node.aggregateFunctions[i];
+
+				if (a.aggFunction !== b.aggFunction || a.name !== b.name) {
+					return false;
+				}
+
+				const aCol = a.col;
+				const bCol = b.col;
+				if (aCol === null || bCol === null) {
+					if (aCol !== bCol) {
+						return false;
+					}
+				}
+				else if (typeof (aCol as any).equals === 'function') {
+					if (!(aCol as any).equals(bCol)) {
+						return false;
+					}
+				}
+				else {
+					// fallback for legacy column objects
+					if ((aCol as any).name !== (bCol as any).name || (aCol as any).relAlias !== (bCol as any).relAlias) {
+						return false;
+					}
 				}
 			}
 

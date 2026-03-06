@@ -230,7 +230,7 @@ columnIndex
 	}
 
 aggFunction
-= func:$('sum'i / 'count'i / 'avg'i / 'min'i / 'max'i) _ '(' _ ('ALL'i __)? col:columnName _ ')'
+= func:$('sum'i / 'count'i / 'avg'i / 'min'i / 'max'i) _ '(' _ ('ALL'i __)? col:valueExpr _ ')'
 	{
 		return {
 			type: 'aggFunction',

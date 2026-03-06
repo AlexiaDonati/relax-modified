@@ -217,7 +217,7 @@ declare module relalgAst {
 
 	interface aggFunction {
 		aggFunction: 'SUM' | 'COUNT' | 'AVG' | 'MIN' | 'MAX' | 'COUNT_ALL',
-		col: columnName,
+		col: valueExpr | null,
 	}
 
 	interface aggFunctionArgument extends aggFunction {

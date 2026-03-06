@@ -749,7 +749,11 @@ export function relalgFromSQLAstRoot(astRoot: sqlAst.rootSql | any, relations: {
 			for (let i = 0; i < projectionArgs.length; i++) {
 				const col = projectionArgs[i];
 				if (col.type === 'aggFunction') {
-					aggregateFunctions.push(col);
+					aggregateFunctions.push({
+						name: col.name,
+						aggFunction: col.aggFunction,
+						col: col.col === null ? null : recValueExpr(col.col),
+					});
 				}
 			}
 
@@ -1130,8 +1134,16 @@ export function relalgFromRelalgAstNode(astNode: relalgAst.relalgOperation, rela
 				{
 					const start = Date.now();
 					const child = recRANode(n.child);
-					const aggregateFunctions = n.aggregate;
 					const groupByCols = n.group;
+
+					// Convert aggregate function arguments to ValueExpr instances so they can be evaluated during execution.
+					const aggregateFunctions: AggregateFunction[] = n.aggregate.map(af => {
+						return {
+							name: af.name,
+							aggFunction: af.aggFunction,
+							col: af.col === null ? null : recValueExpr(af.col),
+						};
+					});
 
 					const node = new GroupBy(child, groupByCols, aggregateFunctions);
 					setAdditionalData(n, node);

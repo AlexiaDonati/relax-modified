@@ -357,7 +357,16 @@ export function textFromRelalgAstNode(node: relalgAst.astNode) {
 							tmp.push(f.name + ' ← COUNT(*)');
 						}
 						else {
-							tmp.push(`${f.name} ← ${f.aggFunction}(${columnName(f.col.name, f.col.relAlias)})`);
+							let colExpr = '*';
+							if (f.col) {
+								if (typeof (f.col as any).getFormulaHtml === 'function') {
+									colExpr = (f.col as any).getFormulaHtml();
+								}
+								else {
+									colExpr = columnName((f.col as any).name, (f.col as any).relAlias);
+								}
+							}
+							tmp.push(`${f.name} ← ${f.aggFunction}(${colExpr})`);
 						}
 					}
 					argument += tmp.join(', ');
