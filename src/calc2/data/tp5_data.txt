@@ -1,0 +1,102 @@
+group: Exercice 1 - Online Shop database
+description: Database for the exercice 1 of TP5 on relational algebra.
+category@en: University of Liège
+
+client = {
+EMAIL:string, NOM:string, PRENOM:string, ADRESSE:string
+
+'alice@mail.com', 'Dupont', 'Alice', 'Liège'
+'bob@mail.com', 'Martin', 'Bob', 'Bruxelles'
+'carol@mail.com', 'Durand', 'Carol', 'Paris'
+'david@mail.com', 'Smith', 'David', 'London'
+'emma@mail.com', 'Bernard', 'Emma', 'Lyon'
+}
+
+article = {
+NO_ARTICLE:number, LIBELLE:string, TYPE:string, PRIX_ACHAT:number
+
+1, 'Laptop', 'Electronics', 700
+2, 'Mouse', 'Electronics', 10
+3, 'Keyboard', 'Electronics', 20
+4, 'Office Chair', 'Furniture', 80
+5, 'Desk Lamp', 'Furniture', 15
+6, 'Notebook', 'Stationery', 2
+}
+
+commande = {
+NO_COMMANDE:number, EMAIL:string, DATE_COMMANDE:string
+
+1001, 'alice@mail.com', '2024-01-10'
+1002, 'bob@mail.com', '2024-01-12'
+1003, 'carol@mail.com', '2024-01-15'
+1004, 'alice@mail.com', '2024-02-01'
+1005, 'emma@mail.com', '2024-02-10'
+}
+
+detail = {
+NO_COMMANDE:number, NO_ARTICLE:number, QUANTITE:number, PRIX_VENTE:number
+
+1001, 1, 1, 900
+1001, 2, 2, 25
+1001, 3, 1, 40
+1001, 4, 1, 120
+1002, 2, 5, 20
+1002, 6, 10, 5
+1003, 4, 1, 120
+1003, 5, 2, 30
+1004, 1, 2, 880
+1004, 3, 1, 35
+1004, 5, 2, 25
+1004, 6, 5, 4
+1005, 2, 3, 18
+1005, 5, 1, 28
+}
+
+group: Exercice 2 - Company database
+description: Database for the exercice 2 of TP5 on relational algebra.
+category@en: University of Liège
+
+personne = {
+ID:number, REG_NAT:string, NOM:string, PRENOM:string, RUE:string, NO:number, CODE_POSTAL:number, LOCALITE:string
+
+1, 'RN1001', 'Dupont', 'Alice', 'Rue de Bruxelles', 12, 4000, 'Liège'
+2, 'RN1002', 'Martin', 'Bob', 'Rue du Centre', 5, 4650, 'Herve'
+3, 'RN1003', 'Durand', 'Claire', 'Rue de la Gare', 8, 4650, 'Chaineux'
+4, 'RN1004', 'Smith', 'David', 'Main Street', 21, 1000, 'Bruxelles'
+5, 'RN1005', 'Bernard', 'Emma', 'Rue Haute', 3, 4000, 'Liège'
+}
+
+fonction = {
+LABEL:string, BUREAU:string
+
+'Developer', 'B101'
+'Tester', 'B102'
+'Project Manager', 'B201'
+'Data Analyst', 'B202'
+}
+
+tache = {
+LABEL:string, TACHE:string
+
+'Developer', 'Ecrire du code'
+'Developer', 'Valider du code'
+'Developer', 'Corriger des bugs'
+'Tester', 'Executer les tests'
+'Tester', 'Rapporter les bugs'
+'Project Manager', 'Planifier le projet'
+'Project Manager', 'Organiser les reunions'
+'Data Analyst', 'Analyser les donnees'
+'Data Analyst', 'Creer des rapports'
+}
+
+contrat = {
+ID:number, DATE_DEBUT:string, LABEL:string, DATE_FIN:string
+
+1, '2018-01-10', 'Developer', '2020-06-30'
+1, '2020-07-01', 'Project Manager', null
+2, '2019-03-15', 'Tester', null
+3, '2017-09-01', 'Developer', '2021-12-31'
+3, '2022-01-01', 'Data Analyst', null
+4, '2015-05-20', 'Developer', '2019-08-31'
+5, '2021-04-01', 'Developer', null
+}

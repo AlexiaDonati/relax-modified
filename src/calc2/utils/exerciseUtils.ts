@@ -3,8 +3,10 @@ import { Exercise, ExerciseInfo, SourceInfo, ExerciseSourceType, VerficationGrou
 import { Group, GroupSourceType } from 'calc2/store/groups';
 
 const ld_tp3: any = require('../data/tp3.txt');
+const ld_tp5: any = require('../data/tp5.txt');
 const LOCAL_DATA: { [id: string]: string } = {
 	'tp3': ld_tp3.default ? ld_tp3.default : '',
+    'tp5': ld_tp5.default ? ld_tp5.default : '',
 };
 
 export function parseExercisesFromDefinition(text: string, groupInfo: ExerciseInfo, sourceInfo: SourceInfo) {
@@ -27,35 +29,56 @@ export function parseExercisesFromDefinition(text: string, groupInfo: ExerciseIn
         let datasetPath = '';
         let testsPath = ['', ''];
 
+        let currentKey: string | null = null;
+
         for (const line of lines) {
             const m = line.match(/^\s*([A-Za-z_]+)\s*:\s*(.*)$/);
-            if (!m) { continue; }
 
-            const key = m[1].toLowerCase();
-            let val = m[2].trim();
+            if (m){ // if the line starts with "key: value",
+                const key = m[1].toLowerCase();
+                let val = m[2].trim();
 
-            if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
-                val = val.substring(1, val.length - 1);
+                if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+                    val = val.substring(1, val.length - 1);
+                }
+
+                switch (key) {
+                    case 'exercise':
+                        name = val;
+                        break;
+                    case 'description':
+                        description = val;
+                        break;
+                    case 'reference':
+                        reference = val;
+                        break;
+                    case 'dataset':
+                        datasetPath = val;
+                        break;
+                    case 'tests':
+                        testsPath = val.split("/");
+                        break;
+                    default:
+                        console.warn('unknown key ' + key + '.');
+                }
+
+                currentKey = key;
             }
-
-            switch (key) {
-                case 'exercise':
-                    name = val;
-                    break;
-                case 'description':
-                    description = val;
-                    break;
-                case 'reference':
-                    reference = val;
-                    break;
-                case 'dataset':
-                    datasetPath = val;
-                    break;
-                case 'tests':
-                    testsPath = val.split("/");
-                    break;
-                default:
-                    break;
+            else { // else it is a continuation of the previous key 
+                if (currentKey === null) {
+                    console.warn('line does not match expected format: ' + line);
+                    continue;
+                }
+                switch (currentKey) {
+                    case 'description':
+                        description += '\n' + line.trim();
+                        break;
+                    case 'reference':
+                        reference += '\n' + line.trim();
+                        break;
+                    default:
+                        console.warn('unexpected continuation line for key ' + currentKey + ': ' + line);
+                }
             }
         }
         

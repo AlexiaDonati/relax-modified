@@ -10,11 +10,13 @@ import * as jQuery from 'jquery';
 import {string} from "prop-types";
 
 const ld_tp3_data: any = require('../data/tp3_data.txt');
+const ld_tp5_data: any = require('../data/tp5_data.txt');
 const ld_sb: any = require('../data/sb.txt');
 const ld_ufes: any = require('../data/ufes.txt');
 const ld: any = require('../data/uibk.txt');
 const LOCAL_DATA: { [id: string]: string } = {
   'tp3_data': ld_tp3_data.default ? ld_tp3_data.default : '',
+  'tp5_data': ld_tp5_data.default ? ld_tp5_data.default : '',
 	'sb': ld_sb.default ? ld_sb.default : '',
   'ufes': ld_ufes.default ? ld_ufes.default : '',
   'uibk': ld.default ? ld.default : '',
@@ -215,7 +217,7 @@ export function loadGroupsFromSource(source: GroupSourceType, id: string, mainta
         }
         catch (e) {
           let msg = 'cannot parse groups file: ' + (e as Error).message;
-          msg += '<br>see log for more information';
+          msg += ' see log for more information';
           console.error(msg, e);
           reject(new Error(msg));
         }

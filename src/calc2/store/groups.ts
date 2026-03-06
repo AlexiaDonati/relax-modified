@@ -255,6 +255,14 @@ export function loadStaticGroups() {
 			id: 'tp3_data',
 		},
 		{
+			maintainerGroup: 'University of Liège',
+			maintainer: 'TP5',
+
+			source: 'local',
+			id: 'tp5_data',
+		},
+		/*
+		{
 			maintainerGroup: t('calc.maintainer-groups.misc'),
 			maintainer: '',
 
@@ -282,7 +290,7 @@ export function loadStaticGroups() {
 			source: 'gist',
 			id: 'd37f667154aec34f5c4954723ae01db9',
 		},
-		/*
+		
 		{
 			maintainerGroup: t('calc.maintainer-groups.uibk'),
 			maintainer: '<a href="https://github.com/mtschu">mtschu</a>',

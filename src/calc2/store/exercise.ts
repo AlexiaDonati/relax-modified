@@ -250,6 +250,11 @@ export function loadStaticExercises() {
             id: 'tp3',
             maintainer: 'TP3',
         },
+        {
+            source: 'local',
+            id: 'tp5',
+            maintainer: 'TP5',
+        },
         /*
         {
             source: 'gist',
