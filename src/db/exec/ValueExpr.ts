@@ -773,6 +773,12 @@ export class ValueExprGeneric extends ValueExpr {
 				if (valueA === null || valueB === null) {
 					return null;
 				}
+
+				// subtraction between dates
+				if (valueA instanceof Date && valueB instanceof Date) {
+					return (valueA.getTime() - valueB.getTime())
+				}
+
 				return valueA - valueB;
 			case 'mul':
 				if (valueA === null || valueB === null) {
@@ -1119,13 +1125,25 @@ export class ValueExprGeneric extends ValueExpr {
 			case 'rownum':
 				return true;
 			case 'add':
-			case 'sub':
 			case 'mul':
 			case 'div':
 			case 'power':
 			case 'log':
 			case 'mod':
 				return this._checkArgsDataType(schemaA, schemaB, ['number', 'number']);
+			case 'sub': // allow subtraction between numbers or dates
+				this._args[0].check(schemaA, schemaB);
+				this._args[1].check(schemaA, schemaB);
+
+				if ((this._args[0].getDataType() !== 'number' || this._args[1].getDataType() !== 'number')
+					&& (this._args[0].getDataType() !== 'date' || this._args[1].getDataType() !== 'date')) {
+					this.throwExecutionError(i18n.t('db.messages.exec.error-function-expects-type', {
+						func: this._func,
+						expected: ['number', 'number'],
+						given: [this._args[0].getDataType(), this._args[1].getDataType()],
+					}));
+				}
+				return true;
 			case 'abs':
 			case 'floor':
 			case 'ceil':
@@ -1137,7 +1155,6 @@ export class ValueExprGeneric extends ValueExpr {
 				return this._checkArgsDataType(schemaA, schemaB, ['number']);
 			case 'strlen':
 				return this._checkArgsDataType(schemaA, schemaB, ['string']);
-
 			case 'year':
 			case 'month':
 			case 'dayofmonth':
@@ -1145,7 +1162,6 @@ export class ValueExprGeneric extends ValueExpr {
 			case 'minute':
 			case 'second':
 				return this._checkArgsDataType(schemaA, schemaB, ['date']);
-
 			default:
 				throw new Error('this should not happen!');
 		}
