@@ -448,8 +448,7 @@ assignment
 
 
 namedColumnExpr
-//= a:valueExpr arrowRight dst:unqualifiedColumnName
-= dst:unqualifiedColumnName arrowRight a:valueExpr 
+= dst:unqualifiedColumnName arrowLeft a:valueExpr 
 	{
 		return {
 			type: 'namedColumnExpr',
@@ -460,8 +459,7 @@ namedColumnExpr
 			codeInfo: getCodeInfo()
 		};
 	}
-/// dst:unqualifiedColumnName arrowLeft a:valueExpr
-/ a:valueExpr arrowLeft dst:unqualifiedColumnName
+/ a:valueExpr arrowRight dst:unqualifiedColumnName
 	{
 		return {
 			type: 'namedColumnExpr',

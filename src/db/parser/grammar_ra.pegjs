@@ -443,7 +443,7 @@ assignment
 
 namedColumnExpr
 //= a:valueExpr arrowRight dst:unqualifiedColumnName
-= dst:unqualifiedColumnName arrowRight a:valueExpr // swap the order of src and dst so that we have a.newName -> a.oldName
+= dst:unqualifiedColumnName arrowLeft a:valueExpr
 	{
 		return {
 			type: 'namedColumnExpr',
@@ -455,7 +455,7 @@ namedColumnExpr
 		};
 	}
 /// dst:unqualifiedColumnName arrowLeft a:valueExpr
-/ a:valueExpr arrowLeft dst:unqualifiedColumnName // swap the order of src and dst so that we have a.oldName <- a.newName
+/ a:valueExpr arrowRight dst:unqualifiedColumnName
 	{
 		return {
 			type: 'namedColumnExpr',
