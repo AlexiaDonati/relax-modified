@@ -24,13 +24,13 @@ NO_ARTICLE:number, LIBELLE:string, TYPE:string, PRIX_ACHAT:number
 }
 
 commande = {
-NO_COMMANDE:number, EMAIL:string, DATE_COMMANDE:string
+NO_COMMANDE:number, EMAIL:string, DATE_COMMANDE:date
 
-1001, 'alice@mail.com', '2024-01-10'
-1002, 'bob@mail.com', '2024-01-12'
-1003, 'carol@mail.com', '2024-01-15'
-1004, 'alice@mail.com', '2024-02-01'
-1005, 'emma@mail.com', '2024-02-10'
+1001, 'alice@mail.com', 2024-01-10
+1002, 'bob@mail.com', 2024-01-12
+1003, 'carol@mail.com', 2024-01-15
+1004, 'alice@mail.com', 2024-02-01
+1005, 'emma@mail.com', 2024-02-10
 }
 
 detail = {
@@ -90,13 +90,13 @@ LABEL:string, TACHE:string
 }
 
 contrat = {
-ID:number, DATE_DEBUT:string, LABEL:string, DATE_FIN:string
+ID:number, DATE_DEBUT:date, LABEL:string, DATE_FIN:date
 
-1, '2018-01-10', 'Developer', '2020-06-30'
-1, '2020-07-01', 'Project Manager', null
-2, '2019-03-15', 'Tester', null
-3, '2017-09-01', 'Developer', '2021-12-31'
-3, '2022-01-01', 'Data Analyst', null
-4, '2015-05-20', 'Developer', '2019-08-31'
-5, '2021-04-01', 'Developer', null
+1, 2018-01-10, 'Developer', 2020-06-30
+1, 2020-07-01, 'Project Manager', null
+2, 2019-03-15, 'Tester', null
+3, 2017-09-01, 'Developer', 2021-12-31
+3, 2022-01-01, 'Data Analyst', null
+4, 2015-05-20, 'Developer', 2019-08-31
+5, 2021-04-01, 'Developer', null
 }

@@ -32,7 +32,10 @@ dataset: local/tp5_data/local/1
 
 exercise: Exercice 2.2
 description: Rechercher les noms et prénoms de la ou les personnes qui ont travaillé le plus longtemps dans l’entreprise. 
-reference: TODO
+reference: X←πID,DATE_DEBUT,DATE_FIN-DATE_DEBUT→DUREE(σDATE_FIN≠NULL(contrat))
+Y←πID,DATE_DEBUT,date('2026-01-10')-DATE_DEBUT→DUREE(σDATE_FIN=NULL(contrat))
+D←γID;SUM(DUREE)→TEMPS_EMPLOI(X∪Y)
+πNOM,PRENOM(personne⨝D⨝γMAX(TEMPS_EMPLOI)→TEMPS_EMPLOI(D))
 dataset: local/tp5_data/local/1
 
 exercise: Exercice 2.3
