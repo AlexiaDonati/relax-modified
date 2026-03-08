@@ -65,13 +65,63 @@ export class Calculator extends React.Component<Props, State> {
 			exerciseModal: false,
 			relationModal: false,
 		};
-		
 
 		this.getCurrentEditor = this.getCurrentEditor.bind(this);
 		this.toggleDatasetModal = this.toggleDatasetModal.bind(this);
 		this.toggleExerciseModal = this.toggleExerciseModal.bind(this);
 		this.insertRelationToggle = this.insertRelationToggle.bind(this);
 		this.loadGroupEditor = this.loadGroupEditor.bind(this);
+	}
+
+	private changeTab(tab: State['activeTab']) {
+		if(tab === this.state.activeTab) {
+			return;
+		}
+
+		if(this.props.exerciseMode) {
+			toast.warn('Switching tabs is not allowed in exercise mode.', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+			});
+			return;
+		}
+
+		this.setState({
+			activeTab: tab,
+		});
+	}
+
+	private matchTabToExerciseType(exerciseType: string): State['activeTab'] {
+		switch (exerciseType) {
+			case 'relational_algebra':
+				return 'relalg';
+			case 'multiset_algebra':
+				return 'bagalg';
+			case 'sql':
+				return 'sql';
+			default:
+				return 'relalg';
+		}
+	}
+
+	componentDidUpdate(prevProps: Props) {
+		if (
+			this.props.exerciseMode &&
+			this.props.exercise &&
+			(prevProps.exercise !== this.props.exercise ||
+			prevProps.exerciseMode !== this.props.exerciseMode)
+		) { 
+			if(this.props.exerciseMode && this.props.exercise) { // set active tab according to current exercise type
+				const activeTab = this.matchTabToExerciseType(this.props.exercise.type);
+
+				if (activeTab !== this.state.activeTab) {
+					this.setState({ activeTab });
+				}
+			}
+		}
 	}
 
 	private toggleDatasetModal() {
@@ -194,7 +244,7 @@ example,  42
 							<NavItem>
 								<NavLink
 									className={classnames({ active: activeTab === 'relalg' })}
-									onClick={() => { this.setState({ activeTab: 'relalg' }); }}
+									onClick={() => { this.changeTab('relalg'); }}
 								>
 									<span className="hideOnSM"><T id="calc.editors.ra.tab-name" /></span>
 									<span className="showOnSM"><T id="calc.editors.ra.tab-name-short" /></span>
@@ -203,7 +253,7 @@ example,  42
 							<NavItem>
 								<NavLink
 									className={classnames({ active: activeTab === 'bagalg' })}
-									onClick={() => { this.setState({ activeTab: 'bagalg' }); }}
+									onClick={() => { this.changeTab('bagalg'); }}
 								>
 									<span className="hideOnSM"><T id="calc.editors.bags.tab-name" /></span>
 									<span className="showOnSM"><T id="calc.editors.bags.tab-name-short" /></span>
@@ -212,7 +262,7 @@ example,  42
 							<NavItem>
 								<NavLink
 									className={classnames({ active: activeTab === 'trc' })}
-									onClick={() => { this.setState({ activeTab: 'trc' }); }}
+									onClick={() => { this.changeTab('trc'); }}
 								>
 									<span className="hideOnSM">TRC</span>
 									<span className="showOnSM">TRC</span>
@@ -221,7 +271,7 @@ example,  42
 							<NavItem>
 								<NavLink
 									className={classnames({ active: activeTab === 'sql' })}
-									onClick={() => { this.setState({ activeTab: 'sql' }); }}
+									onClick={() => { this.changeTab('sql'); }}
 								>
 									<span className="hideOnSM"><T id="calc.editors.sql.tab-name" /></span>
 									<span className="showOnSM"><T id="calc.editors.sql.tab-name-short" /></span>
@@ -230,7 +280,7 @@ example,  42
 							<NavItem>
 								<NavLink
 									className={classnames({ active: activeTab === 'group' })}
-									onClick={() => { this.setState({ activeTab: 'group' }); }}
+									onClick={() => { this.changeTab('group'); }}
 								>
 									<span className="hideOnSM"><T id="calc.editors.group.tab-name" /></span>
 									<span className="showOnSM"><T id="calc.editors.group.tab-name-short" /></span>
@@ -315,7 +365,16 @@ example,  42
 				<Modal isOpen={this.state.exerciseModal} toggle={this.toggleExerciseModal}>
 					<ModalHeader toggle={this.toggleExerciseModal}>{exercise? exercise.name : "Select Exercise"}</ModalHeader>
 					<ModalBody>
-						<MenuExerciseConnected exerciseLoaded={() => { this.setState({ exerciseModal: false }); }} />
+						<MenuExerciseConnected exerciseLoaded={() => { 
+							if(this.props.exercise) {
+								const activeTab = this.matchTabToExerciseType(this.props.exercise.type);
+								this.setState({
+									activeTab,
+								});
+							}
+
+							this.setState({ exerciseModal: false }); 
+						}} />
 					</ModalBody>
 					<ModalFooter>
 						<Button color="secondary" onClick={this.toggleExerciseModal}>{t('calc.result.modal.close')}</Button>

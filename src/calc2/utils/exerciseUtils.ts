@@ -1,6 +1,5 @@
 
-import { Exercise, ExerciseInfo, SourceInfo, ExerciseSourceType, VerficationGroups } from 'calc2/store/exercise';
-import { Group, GroupSourceType } from 'calc2/store/groups';
+import { Exercise, ExerciseInfo, SourceInfo, ExerciseSourceType, VerficationGroups, ExerciseType } from 'calc2/store/exercise';
 
 const ld_tp3: any = require('../data/tp3.txt');
 const ld_tp5: any = require('../data/tp5.txt');
@@ -28,6 +27,7 @@ export function parseExercisesFromDefinition(text: string, groupInfo: ExerciseIn
         let reference = '';
         let datasetPath = '';
         let testsPath = ['', ''];
+        let type = '';
 
         let currentKey: string | null = null;
 
@@ -58,6 +58,9 @@ export function parseExercisesFromDefinition(text: string, groupInfo: ExerciseIn
                     case 'tests':
                         testsPath = val.split("/");
                         break;
+                    case 'type':
+                        type = val;
+                        break;
                     default:
                         console.warn('unknown key ' + key + '.');
                 }
@@ -81,6 +84,15 @@ export function parseExercisesFromDefinition(text: string, groupInfo: ExerciseIn
                 }
             }
         }
+
+        if(type === '') {
+            console.warn('exercise type not specified for exercise ' + name + ', using "relational_algebra" as default.');
+            type = 'relational_algebra';
+        }
+        else if(type !== 'relational_algebra' && type !== 'multiset_algebra' && type !== 'sql') {
+            console.warn('unknown exercise type "' + type + '" for exercise ' + name + ', using "relational_algebra" as default.');
+            type = 'relational_algebra';
+        }
         
         const verificationGroups: VerficationGroups = {
             source: testsPath[0],
@@ -96,6 +108,8 @@ export function parseExercisesFromDefinition(text: string, groupInfo: ExerciseIn
             datasetPath: datasetPath || '',
             
             verificationGroups: verificationGroups,
+
+            type: type as ExerciseType,
 
             exerciseInfo: {
                 ...groupInfo,

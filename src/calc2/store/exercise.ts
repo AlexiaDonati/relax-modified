@@ -176,6 +176,8 @@ export function* rootSaga() {
 
 export type ExerciseSourceType = 'http' | 'gist' | 'local';
 
+export type ExerciseType = 'relational_algebra' | 'multiset_algebra' | 'sql';
+
 export type Exercise = {
     name: string,
     description: string,
@@ -183,6 +185,8 @@ export type Exercise = {
     datasetPath: string
 
     verificationGroups : VerficationGroups
+
+    type: ExerciseType,
 
     exerciseInfo: ExerciseInfo,
     sourceInfo: SourceInfo,
