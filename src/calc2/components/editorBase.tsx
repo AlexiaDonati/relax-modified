@@ -1288,7 +1288,7 @@ export class EditorBase extends React.Component<Props, State> {
 
 											{showReference && this.props.exerciseReference ? 
 												(<div>
-													<div>{ this.props.exerciseReference.reference }</div>
+													<div className='typescript-text'> { this.props.exerciseReference.reference }</div>
 													<button // replace the user query with the reference query
 														type="button"
 														className={classnames('btn btn-secondary')}

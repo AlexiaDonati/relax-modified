@@ -200,12 +200,6 @@ export class EditorBagalg extends React.Component<Props, State> {
 								tooltip: 'calc.editors.ra.toolbar.projection-content',
 							},
 							{
-								label: '→',
-								onClick: this.replaceText,
-								tooltipTitle: 'calc.editors.ra.toolbar.right-arrow',
-								tooltip: 'calc.editors.ra.toolbar.right-arrow-content',
-							},
-							{
 								label: 'σ',
 								onClick: this.replaceText,
 								tooltipTitle: 'calc.editors.ra.toolbar.selection',
@@ -228,6 +222,18 @@ export class EditorBagalg extends React.Component<Props, State> {
 								onClick: this.replaceText,
 								tooltipTitle: 'calc.editors.ra.toolbar.groupBy',
 								tooltip: 'calc.editors.ra.toolbar.groupBy-content',
+							},
+							{
+								label: '→',
+								onClick: this.replaceText,
+								tooltipTitle: 'calc.editors.ra.toolbar.right-arrow',
+								tooltip: 'calc.editors.ra.toolbar.right-arrow-content',
+							},
+							{
+								label: '←',
+								onClick: this.replaceText,
+								tooltipTitle: 'calc.editors.ra.toolbar.rename-columns-operator',
+								tooltip: 'calc.editors.ra.toolbar.rename-columns-operator-content',
 							},
 						],
 					},

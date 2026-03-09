@@ -81,7 +81,7 @@ export class Calculator extends React.Component<Props, State> {
 		if(this.props.exerciseMode) {
 			toast.warn('Switching tabs is not allowed in exercise mode.', {
 				position: toast.POSITION.TOP_RIGHT,
-				autoClose: false,
+				autoClose: 5000,
 				closeOnClick: true,
 				pauseOnHover: true,
 				draggable: true,
