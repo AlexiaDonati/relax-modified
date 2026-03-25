@@ -36,12 +36,6 @@ export class FullOuterJoin extends Join {
 		try {
 			// full outer join always has a concatenated schema
 
-			// check columns appearing in both schemas
-			const conflicts = schemaA.getConflictingColumnsArray(schemaB);
-			if (conflicts.length > 0) {
-				this.throwExecutionError(i18n.t('db.messages.exec.error-join-would-produce-non-unique-columns', { conflicts: conflicts.join(', ') }));
-			}
-
 			this._schema = Schema.concat(this._child.getSchema(), this._child2.getSchema());
 			this._rowCreatorMatched = function (rowA: any[], rowB: any[]): any[] {
 				return rowA.concat(rowB);
