@@ -198,10 +198,9 @@ example,  42
 			<div className="calculator">
 				
 				<ToastContainer enableMultiContainer position={toast.POSITION.TOP_RIGHT} />
-				<div className="row">
-					{/* <div className="d-none d-xs-block d-sm-block d-md-block col-lg-1 col-xl-2"></div> */}
-					
-					<div className="groups-container col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2">
+
+				<div className="calculator-row">
+					<div className="groups-container">
 						<button className="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" onClick={this.toggleDatasetModal} style={{ width: '100%', textAlign: 'left', textOverflow: 'ellipsis', overflow: 'hidden' }}>
 							<span>Select DB ({translateHeader(group.groupName, locale)})</span>
 							<span className="caret" style={{ display: 'block', position: 'absolute', top: '50%', right: '10px' }}></span>
@@ -222,7 +221,7 @@ example,  42
 						</div>
 					</div>
 
-					<div className="calculator-container col-xs-12 col-sm-12 col-md-12 col-lg-8 col-xl-6">
+					<div className="calculator-container">
 						<Nav tabs>
 							<UncontrolledDropdown nav inNavbar className="showOnSM">
 								<DropdownToggle nav>
@@ -287,6 +286,7 @@ example,  42
 								</NavLink>
 							</NavItem>
 						</Nav>
+						
 						<TabContent activeTab={this.state.activeTab} className="tab-content-border">
 							<TabPane tabId="relalg">
 								<EditorRelalg
@@ -331,21 +331,22 @@ example,  42
 						</TabContent>
 					</div>
 
-					<div className="groups-container col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2">
+					<div className="groups-container">
 						<button className="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" onClick={this.toggleExerciseModal} style={{ width: '100%', textAlign: 'left', textOverflow: 'ellipsis', overflow: 'hidden' }}>
 							<span>Select Exercise { exercise? "( " + exercise.name + " )" : ""}</span>
 							<span className="caret" style={{ display: 'block', position: 'absolute', top: '50%', right: '10px' }}></span>
 						</button>
+						<div className="exercise-info">
+							{exerciseMode && exercise !== undefined ?
+								<div>
+									<div>Exercise: {exercise.name}</div>
+									<div>Description: {exercise.description}</div>
+								</div>
+							: ''}
 
-						{exerciseMode && exercise !== undefined ?
-							<div>
-								<div>Exercise: {exercise.name}</div>
-								<div>Description: {exercise.description}</div>
+							<div style={{ marginTop: '10px' }}>
+								<a href="/relax-modified/help#relalg-reference"> <FontAwesomeIcon icon={faQuestionCircle as IconProp} /> Theory </a>
 							</div>
-						: ''}
-
-						<div style={{ marginTop: '10px' }}>
-							<a href="/relax-modified/help#relalg-reference"> <FontAwesomeIcon icon={faQuestionCircle as IconProp} /> Theory </a>
 						</div>
 					</div>
 				</div>
@@ -399,7 +400,7 @@ example,  42
 						<Button color="secondary" onClick={this.insertRelationToggle}>{t('calc.result.modal.close')}</Button>
 					</ModalFooter>
 				</Modal>
-
+				
 			</div>
 
 			</div>

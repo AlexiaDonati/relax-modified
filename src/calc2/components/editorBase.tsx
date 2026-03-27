@@ -1066,11 +1066,13 @@ export class EditorBase extends React.Component<Props, State> {
 					<textarea />
 
 					<div className="exec-errors">
-						{execErrors.map((alert, i) => <ExecutionAlert key={i} alert={alert} editor={editor} />)}
+						<div style={{ margin: '10px 0', padding: '5px'}}>
+							{execErrors.map((alert, i) => <ExecutionAlert key={i} alert={alert} editor={editor} />)}
+						</div>
 					</div>
 
 					<div className="input-buttons">
-						<div style={{ float: 'left' }}>
+						<div>
 							<button
 								type="button"
 								disabled={isExecutionDisabled}
@@ -1129,7 +1131,7 @@ export class EditorBase extends React.Component<Props, State> {
 							: ''}
 						</div>
 
-						<div style={{ float: 'right' }}>
+						<div>
 							<div className="btn-group history-container">
 								<DropdownList
 									label={<span><FontAwesomeIcon icon={faDownload as IconProp} /> <span className="hideOnSM"><T id="calc.editors.ra.button-download" /></span></span>}
