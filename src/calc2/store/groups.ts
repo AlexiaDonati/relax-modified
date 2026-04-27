@@ -456,7 +456,7 @@ export function reduce(oldState: State | undefined, action: store.Action): State
 	}
 }
 
-function getGroupPath(g: Group) {
+export function getGroupPath(g: Group) {
 	const { source, id, filename, index } = g.groupInfo;
 	return `${source}/${id}/${filename}/${index}`;
 }
