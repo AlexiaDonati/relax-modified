@@ -90,9 +90,10 @@ export class ExerciseMaker extends React.Component<Props, State> {
     private async loadReferenceQuery(){
         const editor = this.getCurrentEditor();
         if (editor && editor.current) {
-            const isWellFormed = await editor.current.wellFormedQuery();
-            if(!isWellFormed){
-                toast.warn('The reference query is not well-formed. Please fix the query before adding the exercise.', {
+            const query = editor.current.getText();
+
+            if(!query || query.trim() === ''){
+                toast.warn('The editor is empty. Please enter a reference query before loading it.', {
                     position: toast.POSITION.TOP_RIGHT,
                     autoClose: 5000,
                     closeOnClick: true,
@@ -102,8 +103,19 @@ export class ExerciseMaker extends React.Component<Props, State> {
                 return;
             }
 
-            const query = editor.current.getText();
-            if(query){ this.setState({ referenceQuery: query }); }
+            const isWellFormed = await editor.current.wellFormedQuery();
+            if(!isWellFormed){
+                toast.warn('The reference query returned an error. Please fix it before loading it.', {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 5000,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                });
+                return;
+            }
+
+            this.setState({ referenceQuery: query });
         }
     }
 
@@ -296,9 +308,9 @@ export class ExerciseMaker extends React.Component<Props, State> {
                         </div>
  
                         <div className="groups-container exercise-info">
-                            
-                            <div>
-                                <label>Exercise Name: </label>
+                            <h3>Exercise Information</h3>
+                            <div className="exercise-input">
+                                <label>Name: </label>
                                 <input type="textarea" 
                                     name="name"
                                     onChange={this.handleNameChange}
@@ -307,8 +319,8 @@ export class ExerciseMaker extends React.Component<Props, State> {
                                 />
                             </div>
 
-                            <div>
-                                <label>Exercise Description: </label>
+                            <div className="exercise-input">
+                                <label>Description: </label>
                                 <textarea
                                     name="description"
                                     onChange={this.handleDescriptionChange}
@@ -319,7 +331,7 @@ export class ExerciseMaker extends React.Component<Props, State> {
 
                             <div>
                                 <button onClick={this.loadReferenceQuery}>Load Reference Query from Editor</button>
-                                <label>Exercise Reference Query: {this.state.referenceQuery}</label>
+                                <label>Reference Query: {this.state.referenceQuery}</label>
                             </div>
 
                             {
@@ -333,7 +345,7 @@ export class ExerciseMaker extends React.Component<Props, State> {
 
                             <hr />
 
-                            <div>
+                            <div className="exercise-input">
                                 <label>File Name: </label>
                                 <input type="textarea" 
                                     name="name"
@@ -341,8 +353,10 @@ export class ExerciseMaker extends React.Component<Props, State> {
                                     value={this.state.filename}
                                     placeholder="file name..."
                                 />
-                                <button onClick={this.downloadExercise}>Download Exercise Text File</button>
                             </div>
+
+                            <button onClick={this.downloadExercise}>Download Exercise Text File</button>
+                            
                         </div>
 
 

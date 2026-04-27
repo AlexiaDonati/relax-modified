@@ -51,6 +51,24 @@ body {
 	margin: 0px 16px;
 }
 
+.exercise-input {
+	display: flex;
+	flex-direction: row;
+	align-items: start;
+}
+
+.exercise-input > label {
+	margin-right: 8px;
+}
+
+.exercise-input > input {
+	width: 100% !important;
+}
+
+.exercise-input > textarea {
+	width: 100% !important;
+}
+
 .CodeMirror.readonly .CodeMirror-scroll {
 	background-color: #DFDFDF
 }
