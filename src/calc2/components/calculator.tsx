@@ -4,7 +4,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { faBars, faCalculator, faComment, faDatabase, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faCalculator, faComment, faDatabase, faQuestionCircle, faPencil } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { EditorGroup } from 'calc2/components/editorGroup';
 import { EditorRelalg } from 'calc2/components/editorRelalg';
@@ -284,6 +284,11 @@ example,  42
 									<span className="hideOnSM"><T id="calc.editors.group.tab-name" /></span>
 									<span className="showOnSM"><T id="calc.editors.group.tab-name-short" /></span>
 								</NavLink>
+							</NavItem>
+							<NavItem>
+								<div style={{ marginTop: '10px' }}>
+									<a href="/relax-modified/exercise-maker"> <FontAwesomeIcon icon={faPencil as IconProp} /> Exercise Maker </a>
+								</div>
 							</NavItem>
 						</Nav>
 						

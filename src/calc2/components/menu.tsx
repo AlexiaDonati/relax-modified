@@ -23,6 +23,8 @@ type Props = {
 	locale: store.State['session']['locale'],
 	loadGroupTab: Function,
 	datasetLoaded: Function,
+
+	loadType?: 'path' | 'variable',
 };
 
 
@@ -34,6 +36,10 @@ export class Menu extends React.Component<Props> {
 		super(props);
 		this.gistLink = '';
 	}
+
+	static defaultProps = {
+		loadType: 'path' as const,
+	};
 
 	private getGroupsByHeadlineName = memoize((groups: Props['groups'], locale: string) => {
 		let groupsByHeadlineName = Immutable.OrderedMap<string | null, Group[]>();
@@ -77,7 +83,6 @@ export class Menu extends React.Component<Props> {
 			recentlyUsedGroups = JSON.parse(rug);
 		}
 		
-		
 		return (
 			<div className="container">
 				<div className="row">
@@ -96,15 +101,26 @@ export class Menu extends React.Component<Props> {
 												return null;
 											}
 
-											const path = `/relax-modified/calc/group/${groupInfo.source}/${groupInfo.id}/${groupInfo.filename}/${groupInfo.index}`;
+											if(this.props.loadType === 'path'){
+												const path = `/relax-modified/calc/group/${groupInfo.source}/${groupInfo.id}/${groupInfo.filename}/${groupInfo.index}`;
 
-											return (
-												<li key={path} className={classNames({
-													active: current && current.group.groupInfo === group.groupInfo,
-												})}>
-													<NavLink to={path} onClick={()=>{this.props.datasetLoaded(); }}>{translateHeader(groupName, locale)}</NavLink>
-												</li>
-											);
+												return (
+													<li key={path} className={classNames({
+														active: current && current.group.groupInfo === group.groupInfo,
+													})}>
+														<NavLink to={path} onClick={()=>{this.props.datasetLoaded(); }}>{translateHeader(groupName, locale)}</NavLink>
+													</li>
+												);
+											}
+											else if(this.props.loadType === 'variable') {
+												return (
+													<li key={groupInfo.id} className={classNames({
+														active: current && current.group.groupInfo === group.groupInfo,
+													})}>
+														<a href="#" onClick={() => { this.props.datasetLoaded(group); }}>{translateHeader(groupName, locale)}</a>
+													</li>
+												);
+											}
 										})}
 									</ul>
 								</li>

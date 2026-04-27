@@ -490,4 +490,17 @@ export class EditorBagalg extends React.Component<Props, State> {
 			this.editorBase.replaceSelection(text, overwrite);
 		}
 	}
+
+	public getText(){
+		if(this.editorBase) {
+			return this.editorBase.getText();
+		}
+	}
+
+	public async wellFormedQuery(){
+		if(this.editorBase) {
+			return await this.editorBase.wellFormedQuery();
+		}
+		return false;
+	}
 }

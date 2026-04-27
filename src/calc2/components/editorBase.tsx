@@ -1512,6 +1512,23 @@ export class EditorBase extends React.Component<Props, State> {
 		return editor.getValue();
 	}
 
+	async wellFormedQuery() {
+		const { editor } = this.state;
+		if (!editor) {
+			console.warn(`editor not initialized yet`);
+			return;
+		}
+
+		const query = editor.getValue();
+		if(query.length === 0) {
+			return false;
+		}
+
+		await this.exec(false);
+		return this.state.execSuccessful;
+	}
+
+
 	// region Editor
 
 	focus() {
@@ -1853,7 +1870,7 @@ export class EditorBase extends React.Component<Props, State> {
 
 	// region Execution
 
-	exec(selectionOnly: boolean) {
+	async exec(selectionOnly: boolean) {
 		this.setState({ activeTab: 'exec' });
 
 		const { editor } = this.state;
@@ -1890,6 +1907,7 @@ export class EditorBase extends React.Component<Props, State> {
 			if (query.length === 0) {
 				this.clearExecutionAlerts();
 				this.addExecutionError(t('editor.error-no-query-found'));
+				return false;
 			}
 			this.clearExecutionAlerts();
 
@@ -1912,8 +1930,7 @@ export class EditorBase extends React.Component<Props, State> {
 				});
 				document.dispatchEvent(event);
 
-				this.toggle(); 
-				return true;
+				this.toggle();
 			}
 			catch (e) {
 				console.error(e, e.stack);
@@ -1928,7 +1945,7 @@ export class EditorBase extends React.Component<Props, State> {
 
 	// region Verification
 
-	verify() {	
+	async verify() {	
 		if(!this.props.exerciseMode){
 			throw new Error('tried to verify exercise while not in exercise mode');
 		}

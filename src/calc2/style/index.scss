@@ -39,6 +39,18 @@ body {
 	padding: 0px 16px;
 }
 
+.exercise-type-dropdown {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	margin: 16px 0px;
+}
+
+.exercise-type-dropdown > .exercise-type {
+	margin: 0px 16px;
+}
+
 .CodeMirror.readonly .CodeMirror-scroll {
 	background-color: #DFDFDF
 }

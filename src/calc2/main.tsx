@@ -16,6 +16,7 @@ import { ConnectedCalc } from './views/calc';
 import { Help } from './views/help';
 import { Landing } from './views/landing';
 import { Imprint } from './views/imprint';
+import { ExerciseMakerView } from './views/exMaker';
 
 require('calc2/style/index.scss');
 
@@ -60,6 +61,8 @@ export class Main extends React.Component<Props, State> {
 							<Redirect from="/relax-modified/calc" to="/relax-modified/calc/group/local/uibk/local/0" exact strict />
 							<Route path="/relax-modified/calc/:loadType/:source/:id/:filename/:index" component={ConnectedCalc} />
 							<Route path="/relax-modified/calc/:loadType/:source/:id" component={ConnectedCalc} />
+
+							<Route path="/relax-modified/exercise-maker" component={ExerciseMakerView} />
 
 							<Route path="/relax-modified/api/:loadType/:source/:id/:filename/:index" component={ConnectedCalc} />
 							<Route path="/relax-modified/api/:loadType/:source/:id" component={ConnectedCalc} />
