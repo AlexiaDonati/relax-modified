@@ -63,10 +63,6 @@ code {
 	margin-left: 8px;
 }
 
-.group-container button {
-	/*float: right;*/
-}
-
 .teaser-more {
 	cursor: pointer;
 }
@@ -89,28 +85,29 @@ code {
 	margin-top: 20px;
 }
 
+.logo {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-evenly;
+	align-items: center;
+}
+
+.logo img {
+  	width: 100%;
+  	height: auto;
+}
+
 #heading {
 	margin-top: 20px;
 }
-
-
 
 #landing-header-bar {
 	margin: 0px;
 }
 
-#logos img {
-	margin-left: 8px;
-}
-
 @media only screen and (max-width: 991px) {
 	.getStartedBtn {
 		width: 80%;
-	}
-	#logos img {
-		margin: 0px;
-		width: 100%;
-		height: auto;
 	}
 }
 
