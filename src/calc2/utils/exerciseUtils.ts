@@ -1,5 +1,5 @@
 
-import { Exercise, ExerciseInfo, SourceInfo, ExerciseSourceType, VerficationGroups, ExerciseType } from 'calc2/store/exercise';
+import { Exercise, ExerciseInfo, SourceInfo, ExerciseSourceType, VerificationGroups, ExerciseType } from 'calc2/store/exercise';
 
 const ld_tp3: any = require('../data/tp3.txt');
 const ld_tp5: any = require('../data/tp5.txt');
@@ -85,6 +85,11 @@ export function parseExercisesFromDefinition(text: string, groupInfo: ExerciseIn
             }
         }
 
+        if (name === '' || description === '' || reference === '' || datasetPath === '') {
+            console.warn('definition of index ' + i + ' exercise is missing required fields, skipping exercise.');
+            continue;
+        }
+
         if(type === '') {
             console.warn('exercise type not specified for exercise ' + name + ', using "relational_algebra" as default.');
             type = 'relational_algebra';
@@ -94,7 +99,7 @@ export function parseExercisesFromDefinition(text: string, groupInfo: ExerciseIn
             type = 'relational_algebra';
         }
         
-        const verificationGroups: VerficationGroups = {
+        const verificationGroups: VerificationGroups = {
             source: testsPath[0],
             id: testsPath[1],
 

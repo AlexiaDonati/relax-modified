@@ -174,7 +174,7 @@ export function* rootSaga() {
     });
 }
 
-export type ExerciseSourceType = 'http' | 'gist' | 'local';
+export type ExerciseSourceType = 'maker' | 'gist' | 'local';
 
 export type ExerciseType = 'relational_algebra' | 'multiset_algebra' | 'sql';
 
@@ -184,7 +184,7 @@ export type Exercise = {
     reference: string,
     datasetPath: string
 
-    verificationGroups : VerficationGroups
+    verificationGroups : VerificationGroups
 
     type: ExerciseType,
 
@@ -207,7 +207,7 @@ export type SourceInfo = {
     lastModified?: Date,
 };
 
-export type VerficationGroups = {
+export type VerificationGroups = {
     source: string,
     id: string,
     
