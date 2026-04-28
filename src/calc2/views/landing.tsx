@@ -24,8 +24,8 @@ export class Landing extends React.Component {
 
 					<div className="jumbotron" id="landing-header-bar">
 						<div className="ct logo" id="logos">
-							<div><img src="/assets/logos/fsa_logo.png" alt="FSA" /></div>
-							<div><img src="/assets/logos/montefiore_logo.png" alt="Montefiore" /></div>
+							<a href="https://www.fsa.uliege.be" target="_blank"><img src="assets/logos/fsa_logo.png" alt="FSA"/></a>
+							<a href="https://www.montefiore.uliege.be" target="_blank"><img src="assets/logos/montefiore_logo.png" alt="Montefiore"/></a>
 						</div>
 
 						<div className="col-md-12 ct">
