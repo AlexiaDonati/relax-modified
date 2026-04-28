@@ -553,6 +553,7 @@ type State = {
 	replSelEnd: any,
 	queryResult: any,
 	verifyResult: any,
+	verifyStatus: 'correct' | 'incorrect' | 'unknown',
 	execTime: any,
 	addedExampleSqlQuery: boolean,
 	addedExampleBagsQuery: boolean,
@@ -823,6 +824,7 @@ export class EditorBase extends React.Component<Props, State> {
 			replSelEnd: null,
 			queryResult: null,
 			verifyResult: null,
+			verifyStatus: 'unknown',
 			execTime: null,
 			addedExampleSqlQuery: false,
 			addedExampleBagsQuery: false,
@@ -1041,6 +1043,7 @@ export class EditorBase extends React.Component<Props, State> {
 
 			execResult,
 			verifyResult,
+			verifyStatus,
 			verifyExecResult,
 			verifyReferenceExecResult,
 			verifyReferenceAST,
@@ -1112,7 +1115,8 @@ export class EditorBase extends React.Component<Props, State> {
 									type="button"
 									disabled={isExecutionDisabled}
 									className={classnames('btn btn-secondary verify-button', {
-										'btn-success': verifySuccessful,
+										'btn-success': verifyStatus === 'correct',
+										'btn-danger': verifyStatus === 'incorrect',
 										'disabled': isExecutionDisabled,
 									})}
 									onClick={() => {
@@ -1754,7 +1758,7 @@ export class EditorBase extends React.Component<Props, State> {
 			const token = editor.getTokenAt({
 				line: from.line,
 				ch: from.ch + 1,
-			}, true); // TODO: update typings
+			}, true);
 
 			const proposed = editor.getDoc().getRange(from, to);
 			if (typeof (token.string) !== 'undefined' && token.string.length > proposed.length) {
@@ -1976,7 +1980,8 @@ export class EditorBase extends React.Component<Props, State> {
 					<div className="rect4"></div>
 					<div className="rect5"></div>
 				</div>),
-				
+
+			verifyStatus: 'unknown',
 			verifyExecResult: null,
 			verifyReferenceExecResult: null,
 			verifyReferenceAST: null,
@@ -2002,7 +2007,10 @@ export class EditorBase extends React.Component<Props, State> {
 			this.clearExecutionAlerts();
 
 			if(query === referenceQuery) { // exact same syntax
-				this.setState({ verifyResult: "Solution accepted : Queries string are identical." });
+				this.setState({ 
+					verifyResult: "Solution accepted: Queries string are identical.",
+					verifyStatus: 'correct', 
+				});
 
 				document.dispatchEvent(event);
 				return true;
@@ -2021,8 +2029,11 @@ export class EditorBase extends React.Component<Props, State> {
 				this.setState({ verifyReferenceAST: referenceResult.props.root }); // to latter show link to the needed theory if the ASTs are different
 
 				if(execResult.props.root.equals(referenceResult.props.root)) { // equivalent syntax tree 
-					this.setState({ verifyResult: "Solution accepted : ASTs are identical." });
-					
+					this.setState({ 
+						verifyResult: "Solution accepted: ASTs are identical.",
+						verifyStatus: 'correct',
+					});
+
 					document.dispatchEvent(event);
 					return true;
 				}
@@ -2055,7 +2066,8 @@ export class EditorBase extends React.Component<Props, State> {
 
 				if(!queryResult.equals(referenceQueryResult)) { // different results on reference data
 					this.setState({ 
-						verifyResult: "Solution rejected : Results do not match on the reference dataset.",
+						verifyResult: "Solution rejected: Results do not match on the reference dataset.",
+						verifyStatus: 'incorrect',
 						verifyExecResult: queryResult,
 						verifyReferenceExecResult: referenceQueryResult
 					});
@@ -2088,7 +2100,8 @@ export class EditorBase extends React.Component<Props, State> {
 						// compare the tables
 						if(!queryTestResult.equals(referenceQueryTestResult)) { // different results on test data
 							this.setState({ 
-								verifyResult: "Solution rejected : Results do not match on the test dataset number " + (i+1) + ".",
+								verifyResult: "Solution rejected: Results do not match on the test dataset number " + (i+1) + ".",
+								verifyStatus: 'incorrect',
 								verifyExecResult: queryTestResult,
 								verifyReferenceExecResult: referenceQueryTestResult,
 							});
@@ -2103,7 +2116,11 @@ export class EditorBase extends React.Component<Props, State> {
 				// TODO ALEXIA : implement further tests (e.g., random tests , etc.)
 				
 				// if all tests passed
-				this.setState({ verifyResult: "Solution accepted : Passed all tests in place." });
+				this.setState({ 
+					verifyResult: "Solution accepted: Passed all tests in place.",
+					verifyStatus: 'correct', 
+				});
+
 				document.dispatchEvent(event);
 				return true;
 			}
