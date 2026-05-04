@@ -11,9 +11,6 @@ import { RANode, RANodeBinary, Session } from '../RANode';
 import { Data, Schema } from '../Schema';
 import { Table } from '../Table';
 import * as ValueExpr from '../ValueExpr';
-import { bool } from 'prop-types';
-import Handsontable from "handsontable";
-//import Date = Handsontable._editors.Date;
 
 
 export type JoinCondition = {

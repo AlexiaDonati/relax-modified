@@ -34,12 +34,26 @@ export class FullOuterJoin extends Join {
 
 	_checkSchema(schemaA: Schema, schemaB: Schema): void {
 		try {
-			// full outer join always has a concatenated schema
+			if (this._joinConditionOptions.type === 'natural') { // natural join
+				const {keep, schema} = Schema.concatNatural(schemaA, schemaB, true, this._joinConditionOptions.restrictToColumns);
+				this._schema = schema;
+				
+				this._rowCreatorMatched = function (rowA: any[], rowB: any[]): any[] {
+					return Join.createNaturalRowArray(rowA, rowB, keep.size, keep.keepIndicesA, keep.keepIndicesB);
+				}
+			}
+			else { // theta join
+				const conflicts = schemaA.getConflictingColumnsArray(schemaB);
+				if (conflicts.length > 0) {
+					this.throwExecutionError(i18n.t('db.messages.exec.error-join-would-produce-non-unique-columns', { conflicts: conflicts.join(', ') }));
+				}
 
-			this._schema = Schema.concat(this._child.getSchema(), this._child2.getSchema());
-			this._rowCreatorMatched = function (rowA: any[], rowB: any[]): any[] {
-				return rowA.concat(rowB);
-			};
+				this._schema = Schema.concat(schemaA, schemaB);
+				this._rowCreatorMatched = function (rowA: any[], rowB: any[]): any[] {
+					return rowA.concat(rowB);
+				};
+			}
+
 			this._rowCreatorNotMatched = function (rowA: any[], rowB: any[]): any[] {
 				return rowA.concat(rowB);
 			};
@@ -52,6 +66,10 @@ export class FullOuterJoin extends Join {
 	}
 
 	getResult(doEliminateDuplicateRows: boolean = true, session?: Session) {
+		if(doEliminateDuplicateRows) {
+			this.throwExecutionError("The full outer join is only defined for multisets.");
+		}
+
 		session = this._returnOrCreateSession(session);
 
 		if (this._joinConditionEvaluator === null || this._rowCreatorMatched === null || this._rowCreatorNotMatched === null) {
@@ -89,9 +107,6 @@ export class FullOuterJoin extends Join {
 			this._rowCreatorNotMatched,
 		);
 
-		if (doEliminateDuplicateRows === true) {
-			resultTable.eliminateDuplicateRows();
-		}
 		this.setResultNumRows(resultTable.getNumRows());
 
 		return resultTable;
