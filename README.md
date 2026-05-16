@@ -1,5 +1,5 @@
 # Thesis Project Notice
-This repository is a modified fork of [RelaX](https://github.com/dbis-uibk/relax), originally developed by Victor Mates and Rebecca Grasser under the MIT License.
+This repository is a modified fork of [RelaX](https://github.com/dbis-uibk/relax), originally developed Johannes Kessler BSc at Databases and Information Systems Group at the Institute of Computer Science at the University of Innsbruck under supervision of Michael Tschuggnall PhD and Prof. Dr. Günther Specht under the MIT License.
 
 Modifications have been made by Alexia Donati, 2025-2026, as part of a thesis project at the University of Liège.
 
@@ -16,7 +16,7 @@ A relational algebra calculator
 * Install yarn https://yarnpkg.com/
 * Install node https://nodejs.org/en/
 * Clone the repo
-* Checkout the `development` branch
+* Checkout the `thesis-work` branch
 * Execute `yarn install` to install all dependencies
 * Execute `yarn serve` to locally run the webapp on port 8088
 * (Optional) open folder with https://code.visualstudio.com/ and install the workspace recommended extensions (includes tasks)
@@ -35,7 +35,7 @@ To get started, follow these steps:
 
 ## How to Release
 * Clone the repo
-* Checkout the `development` branch
+* Checkout the `thesis-work` branch
 * Execute `yarn install` to install all dependencies
 * Use `NODE_OPTIONS=--openssl-legacy-provider yarn build` to create release build in the `dist` folder
 * Copy the content of your `dist` folder somewhere outside of the repository
