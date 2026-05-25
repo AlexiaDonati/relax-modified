@@ -2064,7 +2064,9 @@ export class EditorBase extends React.Component<Props, State> {
 					throw new Error(`could not compute result for the reference query`);
 				}
 
-				if(!queryResult.equals(referenceQueryResult)) { // different results on reference data
+				const sortIsRelevant = referenceResult.props.root.getHelpId().find((id: {name: string, helpId: string}) => id.helpId === 'relalg-operations-orderby') !== undefined;
+
+				if(!queryResult.equals(referenceQueryResult, sortIsRelevant)) { // different results on reference data
 					this.setState({ 
 						verifyResult: "Solution rejected: Results do not match on the reference dataset.",
 						verifyStatus: 'incorrect',
@@ -2098,7 +2100,7 @@ export class EditorBase extends React.Component<Props, State> {
 						}
 
 						// compare the tables
-						if(!queryTestResult.equals(referenceQueryTestResult)) { // different results on test data
+						if(!queryTestResult.equals(referenceQueryTestResult, sortIsRelevant)) { // different results on test data
 							this.setState({ 
 								verifyResult: "Solution rejected: Results do not match on the test dataset number " + (i+1) + ".",
 								verifyStatus: 'incorrect',
@@ -2112,9 +2114,6 @@ export class EditorBase extends React.Component<Props, State> {
 					}
 				}
 
-				// --- Further tests ---
-				// TODO ALEXIA : implement further tests (e.g., random tests , etc.)
-				
 				// if all tests passed
 				this.setState({ 
 					verifyResult: "Solution accepted: Passed all tests in place.",

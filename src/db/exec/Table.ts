@@ -134,12 +134,10 @@ export class Table {
 		return '<table>' + thead + tbody + '</table>';
 	}
 
-	equals(table: Table) {
+	equals(table: Table, sortIsRelevant: boolean = false) {
 		if (table instanceof Table === false) {
 			throw new Error('can not compare');
 		}
-
-		// TODO Alexia : more flexible schema comparison
 
 		// compare schema
 		if (this._schema.equals(table._schema) === false) {
@@ -155,9 +153,11 @@ export class Table {
 		const otherRows = table.getRowsMappedToSchema(this.getSchema());
 		tableB.addRows(otherRows);
 
-		// sort rows the same way in both tables for comparison
-		tableA.sort();
-		tableB.sort();	
+		if(!sortIsRelevant) { // if sort is not relevant to the comparaison
+			// sort rows the same way in both tables for comparison
+			tableA.sort(); 
+			tableB.sort();	
+		}
 
 		// compare rows
 		if (tableA._rows.length !== tableB._rows.length) {
