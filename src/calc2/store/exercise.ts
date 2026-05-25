@@ -4,6 +4,7 @@ import * as saga from 'redux-saga/effects';
 import * as store from 'calc2/store';
 import { Group, GroupSourceType } from 'calc2/store/groups';
 import { loadExercisesFromSource } from 'calc2/utils/exerciseUtils';
+import { alignGroupToDataset } from '../utils/groupUtils';
 
 export type State = {
     exercises: Immutable.Map<string, Exercise>,
@@ -52,14 +53,13 @@ export function* rootSaga() {
                 }
 
                 const loadedExercises: Exercise[] = yield saga.call(loadExercisesFromSource, source, id, maintainer);
-
                 for (const exercise of loadedExercises) { // set the groups element of the verificationGroups element of each exercise
                     const { source, id } = exercise.verificationGroups;
-                    if(source === '' as GroupSourceType || id === ''){
+                    if(source === '' as GroupSourceType || id === ''){ // if no verification groups are specified for the exercise, skip loading the groups
                         continue;
                     }
 
-                    const actionGroup: store.Action = {
+                    const actionGroupVerification: store.Action = {
                         type: 'GROUPS_LOAD_REQUEST',
 
                         source: source,
@@ -72,16 +72,34 @@ export function* rootSaga() {
 
                         hidden: true, // do not show the verification groups of the exercise in the group overview
                     };
-                    yield saga.put(actionGroup);
+                    yield saga.put(actionGroupVerification); // trigger loading of the verification groups of the exercise
 
-                    yield saga.take('GROUPS_LOAD_SUCCESS');
+                    yield saga.take('GROUPS_LOAD_SUCCESS'); // wait until the groups have been loaded
                     const updatedState: store.State = yield saga.select();
 
-                    const findGroups = updatedState.groups.groups.filter(e => (
+                    const dsPath = exercise.datasetPath.split("/");
+                    const findReferenceGroup = updatedState.groups.groups.find(g => (
+                        g.groupInfo.source === dsPath[0]
+                        && g.groupInfo.id === dsPath[1]
+                        && g.groupInfo.filename === dsPath[2]
+                        && g.groupInfo.index === parseInt(dsPath[3], 10)
+                    )); // find the reference group in the state
+
+                    if (!findReferenceGroup) {
+                        console.warn('could not find reference group for exercise ' + exercise.name + ', skipping alignment of verification groups to dataset.');
+                        continue;
+                    }
+
+                    const findVerificationGroups = updatedState.groups.groups.filter(e => (
                         e.groupInfo.source === source
                         && e.groupInfo.id === id
-                    ));
-                    exercise.verificationGroups.groups = Array.from(findGroups.values());
+                    )); // find the loaded groups in the state
+
+                    const alignedGroups: Group[] = [];
+                    for (const group of Array.from(findVerificationGroups.values())) {
+                        alignedGroups.push(alignGroupToDataset(group, findReferenceGroup));
+                    }
+                    exercise.verificationGroups.groups = alignedGroups;
                 }
 
                 const success: EXERCISES_LOAD_SUCCESS = {

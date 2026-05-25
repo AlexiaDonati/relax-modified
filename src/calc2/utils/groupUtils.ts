@@ -4,10 +4,11 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import * as jQuery from 'jquery';
+
 import { Group, GroupInfo, GroupSourceType, HeaderTranslated, SourceInfo } from 'calc2/store/groups';
 import { parseRelalgGroup, relalgFromRelalgAstNode, replaceVariables } from 'db/relax-core';
-import * as jQuery from 'jquery';
-import {string} from "prop-types";
+import { Relation } from 'db/exec/Relation';
 
 const ld_tp3_data: any = require('../data/tp3_data.txt');
 const ld_tp5_data: any = require('../data/tp5_data.txt');
@@ -234,4 +235,45 @@ export function loadGroupsFromSource(source: GroupSourceType, id: string, mainta
         reject(new Error('unknown source ' + source));
     }
   });
+}
+
+export function alignGroupToDataset(source: Group, target: Group): Group {
+  const alignedGroup: Group = { ...source, tables: [] };
+
+  // for each table in the target dataset, try to find a matching table in the source dataset.
+  let sourceToTargetTables = target.tables.map(targetTable => {
+    let match = source.tables.find(sourceTable => sourceTable.tableName === targetTable.tableName);
+
+    if(match){ // if there is a table with the same name in the source dataset, 
+      const sourceSchema = match.relation.getSchema();
+      const targetSchema = targetTable.relation.getSchema();
+
+      if(!sourceSchema.equals(targetSchema)){ // check if the schemas are compatible.
+        console.warn('table ', targetTable.tableName, ' exists in both the reference and test dataset but has incompatible schema so the schema from the reference dataset will be used');
+        match = undefined; // if they are not compatible, ignore the table from the test dataset.
+      }
+    }
+
+    if(!match){ // if the table does not exist in the source dataset,
+      const targetRelation = new Relation(targetTable.tableName);
+      targetRelation.setSchema(targetTable.relation.getSchema(), true);
+
+      match = { // create an empty table with the same schema as the target table.
+        ...targetTable,
+        relation: targetRelation
+      };
+    }
+
+    return match;
+  });
+
+  source.tables.forEach(sourceTable => { // for each table in the source dataset, 
+    const match = target.tables.find(targetTable => targetTable.tableName === sourceTable.tableName); // try to find a matching table in the target dataset.
+    if (!match) { // if the there are tables in the source dataset that do not exist in the target dataset,
+      alignedGroup.tables.push(sourceTable); // add them to the end of the aligned group.
+    }
+  });
+
+  alignedGroup.tables = sourceToTargetTables;
+  return alignedGroup;
 }
