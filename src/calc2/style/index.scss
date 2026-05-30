@@ -13,6 +13,10 @@ body {
 	font-family: Open Sans Light, DejaVu Sans, sans-serif;
 }
 
+.select-database{
+	margin-left: 16px;
+}
+
 .calculator-row {
 	width: 100% !important;
 
@@ -51,6 +55,18 @@ body {
 	margin: 0px 16px;
 }
 
+.exercise-category{
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.exercise-category > div {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
 .exercise-input {
 	display: flex;
 	flex-direction: row;
@@ -67,6 +83,26 @@ body {
 
 .exercise-input > textarea {
 	width: 100% !important;
+}
+
+.testbattery-dropdown {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.testbattery-dropdown > .testbattery-source {
+	margin: 0px 16px;
+}
+.exercise-item {
+	display: flex;
+	flex-direction: row !important;
+	justify-content: space-between;
+	align-items: start;
+}
+
+.selected-exercise {
+	color: blue;
 }
 
 .CodeMirror.readonly .CodeMirror-scroll {

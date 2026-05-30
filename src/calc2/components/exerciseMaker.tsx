@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { Group, getGroupPath } from 'calc2/store/groups';
-import { Exercise, ExerciseInfo, VerificationGroups } from '../store/exercise';
+import { Exercise, VerificationGroups } from '../store/exercise';
 
 import { EditorRelalg } from 'calc2/components/editorRelalg';
 import { EditorBagalg } from 'calc2/components/editorBagalg';
@@ -23,12 +23,16 @@ type State = {
     exercises: Exercise[],
 
     // current exercise
+    selectedExerciseIndex: number | null,
 
     group: Group | undefined,
     exerciseType: 'relational_algebra' | 'multiset_algebra',
     name: string,
     description: string,
     referenceQuery: string,
+
+    testBatterySource: 'local' | 'gist',
+    testBattery: string,
 };
 
 export class ExerciseMaker extends React.Component<Props, State> {
@@ -46,21 +50,25 @@ export class ExerciseMaker extends React.Component<Props, State> {
             id: Date.now(),
             filename: 'exercises',
             exercises: [],
+            
+            selectedExerciseIndex: null,
 
             group: undefined,
             exerciseType: 'relational_algebra',
             name: '',
             description: '',
             referenceQuery: '',
+
+            testBatterySource: 'gist',
+            testBattery: '',
         };
 
         // Bind methods
         this.toggleDatasetModal = this.toggleDatasetModal.bind(this);
-        this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
         this.loadReferenceQuery = this.loadReferenceQuery.bind(this);
 
-        this.handleFilenameChange = this.handleFilenameChange.bind(this);
-        this.addExerciseToList = this.addExerciseToList.bind(this);
+        this.saveExerciseToList = this.saveExerciseToList.bind(this);
+        this.cancelExerciseEdit = this.cancelExerciseEdit.bind(this);
     }
 
     private toggleDatasetModal() {
@@ -79,6 +87,7 @@ export class ExerciseMaker extends React.Component<Props, State> {
 	}
 
     // current exercise info 
+
     private handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         this.setState({ name: event.target.value });
     }
@@ -119,21 +128,75 @@ export class ExerciseMaker extends React.Component<Props, State> {
         }
     }
 
-    // exercises file
-
-    private handleFilenameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        this.setState({ filename: event.target.value });
-    }
-    
-    private getNumberOfExercises = () => {
-        return this.state.exercises.length;
+    private handleTestBatteryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        this.setState({ testBattery: event.target.value });
     }
 
-    private addExerciseToList = () => {
-        const { group, name, description, referenceQuery, exerciseType } = this.state;
+    private checkGistExists = async (gistId: string): Promise<boolean> => {
+        try {
+            const response = await fetch(`https://api.github.com/gists/${gistId}`);
+            console.log(response);
+            return response.ok;
+        }
+        catch (e) {
+            toast.error('An error occurred while verifying the test battery Gist. Please try again later.', {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 5000,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
+            return false;
+        }
+    }
+
+    // add or update exercise 
+
+    private cancelExerciseEdit = () => {
+        this.setState({
+            selectedExerciseIndex: null,
+            name: '',
+            description: '',
+            referenceQuery: '',
+            testBattery: '',
+        });
+    }
+
+    private loadExerciseToEdit = (index: number) => {
+        const exercise = this.state.exercises[index];
+        if (!exercise) {
+            toast.error('Exercise not found.', {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 5000,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
+            return;
+        }
+
+        if(exercise.type !== 'relational_algebra' && exercise.type !== 'multiset_algebra') {
+            return;
+        }
+
+        this.setState({
+            selectedExerciseIndex: index,
+            name: exercise.name,
+            description: exercise.description,
+            referenceQuery: exercise.reference,
+
+            testBatterySource: exercise.verificationGroups.source as ('local' | 'gist'),
+            testBattery: exercise.verificationGroups.id,
+            
+            exerciseType: exercise.type,
+        });
+    }
+
+    private saveExerciseToList = async () => {
+        const { group, name, description, referenceQuery, testBatterySource, testBattery, exerciseType, selectedExerciseIndex } = this.state;
         
         if(!group || name === '' || description === '' || referenceQuery === '') {
-            toast.warn('Please fill in all fields and load a reference query before adding the exercise.', {
+            toast.warn('Please fill in all required fields and load a reference query before adding the exercise.', {
                 position: toast.POSITION.TOP_RIGHT,
                 autoClose: 5000,
                 closeOnClick: true,
@@ -145,21 +208,20 @@ export class ExerciseMaker extends React.Component<Props, State> {
 
         const datasetPath = getGroupPath(group);
 
-        const verificationGroups: VerificationGroups = { //TODO: add verification path
-            source: '',
-            id: '',
-            groups: undefined,
-        }
+        if(testBatterySource === 'gist' && testBattery !== '') {
+            const exists = await this.checkGistExists(testBattery);
 
-        
-        const exerciseInfo: ExerciseInfo = {
-            source: 'maker',
-            id: (this.state.id).toString(),
-            filename: this.state.filename,
-            
-            index: this.getNumberOfExercises(), /** nth definition within the file */
-            maintainer: 'maker',
-        };
+            if (!exists) {
+                toast.warn('The specified test battery Gist was not found. Please check the identifier and try again.', {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 5000,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                });
+                return;
+            }
+        }
 
         const exercise: Exercise = {
             name: name,
@@ -167,21 +229,63 @@ export class ExerciseMaker extends React.Component<Props, State> {
             reference: referenceQuery,
             datasetPath: datasetPath,
 
-            verificationGroups: verificationGroups,
+            verificationGroups: { 
+                source: testBatterySource,
+                id: testBattery,
+                groups: undefined,
+            },
 
             type: exerciseType,
 
-            exerciseInfo: exerciseInfo,
+            exerciseInfo: {
+                source: 'maker',
+                id: (this.state.id).toString(),
+                filename: this.state.filename,
+                index: selectedExerciseIndex === null ? this.getNumberOfExercises() : selectedExerciseIndex,
+                maintainer: 'maker',
+            },
             sourceInfo: {},
         }
 
-        this.state.exercises.push(exercise); // add exercise to file
+        if (selectedExerciseIndex === null) {
+            this.setState(state => ({
+                exercises: [...state.exercises, exercise],
+                name: '',
+                description: '',
+                referenceQuery: '',
+                testBattery: '',
+            }));
+        }
+        else {
+            this.setState(state => {
+                const exercises = state.exercises.slice();
+                const existing = exercises[selectedExerciseIndex];
+                exercise.exerciseInfo = {
+                    ...existing.exerciseInfo,
+                    filename: state.filename,
+                    index: selectedExerciseIndex,
+                };
+                exercises[selectedExerciseIndex] = exercise;
 
-        this.setState({ // reset current exercise for new exercise
-            name: '',
-            description: '',
-            referenceQuery: '',
-        });
+                return {
+                    exercises,
+                    selectedExerciseIndex: null,
+                    name: '',
+                    description: '',
+                    referenceQuery: '',
+                };
+            });
+        }
+    }
+
+    // exercises file
+
+    private handleFilenameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        this.setState({ filename: event.target.value });
+    }
+    
+    private getNumberOfExercises = () => {
+        return this.state.exercises.length;
     }
 
     private downloadExercise = () => {
@@ -201,7 +305,6 @@ export class ExerciseMaker extends React.Component<Props, State> {
         const filename_with_extension = filename + '.txt';
 
         let fileContent = '';
-
         for (const exercise of exercises) {
             const nameLine = `exercise: ${exercise.name}\n`;
             const descriptionLine = `description: ${exercise.description}\n`;
@@ -209,7 +312,12 @@ export class ExerciseMaker extends React.Component<Props, State> {
             const datasetLine = `dataset: ${exercise.datasetPath}\n`;
             const typeLine = `type: ${exercise.type}\n`;
 
-            fileContent += nameLine + descriptionLine + referenceLine + datasetLine + typeLine + '\n';
+            let testBatteryLine = '';
+            if(exercise.verificationGroups.id !== '') {
+                testBatteryLine = `test_battery: ${exercise.verificationGroups.source}/${exercise.verificationGroups.id}\n`;
+            }
+
+            fileContent += nameLine + descriptionLine + referenceLine + datasetLine + typeLine + testBatteryLine + '\n';
         }
 
         const file = new Blob([fileContent], { type: 'text/plain' });
@@ -226,7 +334,7 @@ export class ExerciseMaker extends React.Component<Props, State> {
         return (
             <div className="calculator">
 
-                <div className="calculator-row">
+                <div className={group ? "calculator-row" : "select-database"}>
                     <div className="groups-container">
                         <button 
                             className="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" 
@@ -308,39 +416,112 @@ export class ExerciseMaker extends React.Component<Props, State> {
                         </div>
  
                         <div className="groups-container exercise-info">
-                            <h3>Exercise Information</h3>
-                            <div className="exercise-input">
-                                <label>Name: </label>
-                                <input type="textarea" 
-                                    name="name"
-                                    onChange={this.handleNameChange}
-                                    value={this.state.name}
-                                    placeholder="name..."
-                                />
+                            <div className="exercise-category">
+                                <h4>Exercise Information</h4>
+
+                                <div>
+                                    <div className="exercise-input">
+                                        <label>Name: </label>
+                                        <input type="textarea" 
+                                            name="name"
+                                            onChange={this.handleNameChange}
+                                            value={this.state.name}
+                                            placeholder="name..."
+                                        />
+                                    </div>
+
+                                    <div className="exercise-input">
+                                        <label>Description: </label>
+                                        <textarea
+                                            name="description"
+                                            onChange={this.handleDescriptionChange}
+                                            value={this.state.description}
+                                            placeholder="description..."
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div className="exercise-input">
+                                        <label>Reference Query: </label>
+                                        <textarea
+                                            name="referenceQuery"
+                                            value={this.state.referenceQuery}
+                                            placeholder="load a query..."
+                                            readOnly
+                                        />
+                                    </div>
+                                    
+                                    <button onClick={this.loadReferenceQuery}>Load Reference Query from Editor</button>
+                                </div>
+
+                                <div>
+                                    <span>Test Battery (optional): </span> 
+                                    <div className="testbattery-dropdown">
+                                        <UncontrolledDropdown>
+                                            <DropdownToggle>Select Source</DropdownToggle>
+                                            <DropdownMenu>
+                                                <DropdownItem onClick={() => this.setState({ testBatterySource: 'local' })}>local</DropdownItem>
+                                                <DropdownItem onClick={() => this.setState({ testBatterySource: 'gist' })}>Gist</DropdownItem>
+                                            </DropdownMenu>
+                                        </UncontrolledDropdown>
+                                        <div className="testbattery-source">{this.state.testBatterySource === 'local' ? 'local' : 'Gist'}</div>
+                                    </div>
+                                
+                                    <div className="exercise-input">
+                                        <label>id: </label>
+                                        <input type="textarea" 
+                                            name="testBattery"
+                                            onChange={this.handleTestBatteryChange}
+                                            value={this.state.testBattery}
+                                            placeholder={`${this.state.testBatterySource === 'local' ? 'Local' : 'Gist'} identifier...`}
+                                        />
+                                    </div>
+
+                                    {
+                                    //TODO: Handle the creation of new test battery
+                                    }
+                                </div>
+
+                                <div className="exercise-item">
+                                    <button onClick={this.saveExerciseToList}>
+                                        {this.state.selectedExerciseIndex === null ? 'Add Exercise to File' : 'Update Exercise'}
+                                    </button>
+
+                                    {this.state.selectedExerciseIndex !== null && (
+                                        <button type="button" onClick={this.cancelExerciseEdit}>
+                                            Cancel Edit
+                                        </button>
+                                    )}
+                                </div>
                             </div>
 
-                            <div className="exercise-input">
-                                <label>Description: </label>
-                                <textarea
-                                    name="description"
-                                    onChange={this.handleDescriptionChange}
-                                    value={this.state.description}
-                                    placeholder="description..."
-                                />
-                            </div>
+                            <hr />
 
-                            <div>
-                                <button onClick={this.loadReferenceQuery}>Load Reference Query from Editor</button>
-                                <label>Reference Query: {this.state.referenceQuery}</label>
-                            </div>
+                            <div className="exercise-list">
+                                <h4>Defined Exercises</h4>
+                                
+                                {this.state.exercises.length === 0 ? (
+                                    <div>No exercises added yet.</div>
+                                ) : (
+                                    <div> 
+                                        <div>{this.getNumberOfExercises()} exercises in file</div>
+                                        <ul>
+                                            {this.state.exercises.map((exercise, index) => (
+                                                <li key={index}><div className={`exercise-item ${this.state.selectedExerciseIndex === index && 'selected-exercise'}`}>
+                                                    <strong>{exercise.name}</strong>
 
-                            {
-                            //TODO: Handle test battery
-                            }
-
-                            <div>
-                                <button onClick={this.addExerciseToList}>Add Exercise to File</button>
-                                <div>{this.getNumberOfExercises()} exercises in file</div>
+                                                    {this.state.selectedExerciseIndex === index ? (<span>(editing)</span>
+                                                    ) : (
+                                                        <button type="button" onClick={() => this.loadExerciseToEdit(index)}>
+                                                            Edit
+                                                        </button>
+                                                    )}
+                                                </div></li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
                             </div>
 
                             <hr />
@@ -355,13 +536,11 @@ export class ExerciseMaker extends React.Component<Props, State> {
                                 />
                             </div>
 
-                            <button onClick={this.downloadExercise}>Download Exercise Text File</button>
-                            
+                            <button onClick={this.downloadExercise}>Download Exercise Text File</button>  
                         </div>
 
 
-                    </> : "Please select a database to start creating exercises."}
-
+                    </> : "Please select a reference dataset to start creating exercises."}
                 </div>
             </div>
         );

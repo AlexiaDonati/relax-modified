@@ -9,8 +9,6 @@ import { Table } from 'db/exec/Table';
 import { printValue } from 'db/exec/ValueExpr';
 import * as React from 'react';
 
-require('./pagedTable.scss');
-
 interface Props {
 	table: Table,
 	maxLinesPerPage: number,

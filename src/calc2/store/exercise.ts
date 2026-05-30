@@ -192,7 +192,7 @@ export function* rootSaga() {
     });
 }
 
-export type ExerciseSourceType = 'maker' | 'gist' | 'local';
+export type ExerciseSourceType = 'gist' | 'local';
 
 export type ExerciseType = 'relational_algebra' | 'multiset_algebra' | 'sql';
 

@@ -1529,7 +1529,7 @@ export class EditorBase extends React.Component<Props, State> {
 		}
 
 		await this.exec(false);
-		return this.state.execSuccessful;
+		return this.state.execSuccessful && this.state.execErrors.length === 0;
 	}
 
 
